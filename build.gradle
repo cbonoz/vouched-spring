@@ -1,0 +1,82 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.0.6'
+    id 'io.spring.dependency-management' version '1.1.0'
+}
+
+group = 'com.vouched'
+version = '1.0.0'
+sourceCompatibility = '17'
+
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-freemarker'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+
+    implementation 'com.mailjet:mailjet-client:5.2.3'
+
+    // flyway
+    implementation 'org.flywaydb:flyway-core'
+
+    implementation 'com.google.inject:guice:5.1.0'
+    implementation 'com.google.inject.extensions:guice-assistedinject:5.1.0'
+
+    // sentry
+    implementation 'io.sentry:sentry-spring-boot-starter-jakarta:6.20.0'
+
+    // jdbi
+    implementation 'org.jdbi:jdbi3-core:3.37.1'
+    implementation 'org.jdbi:jdbi3-spring5:3.37.1'
+    implementation 'org.jdbi:jdbi3-postgres:3.37.1'
+
+    implementation 'org.jdbi:jdbi3-jackson2:3.37.1'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.1'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.1'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.15.1'
+
+    // jwt decoder rg.springframework.security.oauth2.jwt
+    implementation 'org.springframework.security:spring-security-oauth2-jose:6.0.2'
+
+    // rosetta row mapper
+    implementation 'com.hubspot.rosetta:RosettaJdbi3:3.11.10'
+
+
+    // Sql object
+    implementation 'org.jdbi:jdbi3-sqlobject:3.37.1'
+
+    // Google Sheets API
+//    implementation 'com.google.api-client:google-api-client:1.32.1'
+//    implementation 'com.google.oauth-client:google-oauth-client-jetty:1.32.1'
+//    implementation 'com.google.apis:google-api-services-sheets:v4-rev581-1.25.0'
+    // https://mvnrepository.com/artifact/com.google.http-client/google-http-client-jackson
+
+
+
+
+    compileOnly 'org.projectlombok:lombok'
+    runtimeOnly 'org.postgresql:postgresql'
+    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
