@@ -5,7 +5,7 @@ import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jwt.SignedJWT;
 import com.vouched.dao.UserDao;
 import com.vouched.error.SoftException;
-import com.vouched.model.domain.User;
+import com.vouched.model.domain.VouchedUser;
 import com.vouched.service.CustomUserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -60,34 +60,35 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             UserToken user = createSuperUser(email);
             Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, null);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-        } else {
+            chain.doFilter(request, response);
+            return;
+        }
 
-            try {
-                SignedJWT signedJWT;
-                signedJWT = SignedJWT.parse(token);
-                signedJWT.verify(verifier);
+        try {
+            SignedJWT signedJWT;
+            signedJWT = SignedJWT.parse(token);
+            signedJWT.verify(verifier);
 
-                Map<String, Object> claims = signedJWT.getJWTClaimsSet().getClaims();
-                String username = (String) claims.get("sub");
+            Map<String, Object> claims = signedJWT.getJWTClaimsSet().getClaims();
+            String username = (String) claims.get("sub");
 
-                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    UserToken user = customUserService.loadUserByUsername(username);
-                    Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, null);
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                }
-            } catch (Exception ex) {
-                // Token is invalid or expired
-                throw new SoftException(ex);
-                // Handle the exception or ignore it
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserToken user = customUserService.loadUserByUsername(username);
+                Authentication authentication = new UsernamePasswordAuthenticationToken(user, null, null);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             }
+        } catch (Exception ex) {
+            // Token is invalid or expired
+            throw new SoftException(ex);
+            // Handle the exception or ignore it
         }
 
         chain.doFilter(request, response);
     }
 
     private UserToken createSuperUser(String email) {
-        User user = userDao.getUserByEmail(email).orElseThrow();
-        return UserToken.createEmailUser(user.id(), user.externalId(), user.email());
+        VouchedUser vouchedUser = userDao.getUserByEmail(email).orElseThrow();
+        return UserToken.createSuperUserToken(vouchedUser.id(), vouchedUser.externalId(), vouchedUser.email());
     }
 
     private String extractToken(HttpServletRequest request) {

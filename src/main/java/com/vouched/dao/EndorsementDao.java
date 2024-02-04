@@ -16,24 +16,28 @@ public interface EndorsementDao {
     @GetGeneratedKeys
     UUID createEndorsement(@Bind UUID userId, @Bind UUID endorserId, @Bind String message);
 
-// select paginated for endorser
+    // select paginated for endorser
     @SqlQuery("SELECT * FROM endorsements WHERE endorser_id = :endorserId ORDER BY created_at DESC LIMIT :limit OFFSET :offset")
     List<Endorsement> getEndorsementsForEndorser(@Bind UUID endorserId, @Bind int limit, @Bind int offset);
 
     // select paginated for user
-    @SqlQuery("SELECT * FROM endorsements WHERE user_id = :userId ORDER BY created_at DESC LIMIT :limit OFFSET :offset")
-    List<Endorsement> getEndorsementsForUser(@Bind UUID userId, @Bind int limit, @Bind int offset);
+    @SqlQuery("SELECT * FROM endorsements WHERE user_id = :userId and (:includeAll or approved_at is not null)" +
+            " ORDER BY created_at DESC LIMIT :limit OFFSET :offset")
+    List<Endorsement> getEndorsementsForUser(@Bind UUID userId, @Bind int limit, @Bind int offset, @Bind boolean includeAll);
 
-// update
+    // update
     @SqlQuery("UPDATE endorsements SET message = :message WHERE user_id = :userId and endorser_id = :endorserId returning *")
     Optional<Endorsement> updateEndorsement(@Bind String message, @Bind UUID userId, @Bind UUID endorserId);
 
 
-
     @SqlQuery("SELECT * FROM endorsements WHERE id = :endorsementId")
-    Endorsement getEndorsement(UUID endorsementId);
+    Optional<Endorsement> getEndorsement(UUID endorsementId);
 
     // delete
     @SqlQuery("DELETE FROM endorsements WHERE id = :endorsementId returning *")
     Optional<Endorsement> deleteEndorsement(UUID endorsementId);
+
+    // update
+    @SqlQuery("UPDATE endorsements SET approved_at = now() WHERE id = :endorsementId returning *")
+    Optional<Endorsement> approveEndorsement(UUID endorsementId);
 }

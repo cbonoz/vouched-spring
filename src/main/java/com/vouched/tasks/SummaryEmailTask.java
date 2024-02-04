@@ -1,21 +1,21 @@
-package com.vouched.tasks;
-
-import org.springframework.stereotype.Component;
-
-@Component
-public class SummaryEmailTask {
-
-//    private final CommentService commentService;
+//package com.vouched.tasks;
 //
-//    @Inject
-//    public SummaryEmailTask(CommentService commentService) {
-//        this.commentService = commentService;
-//    }
+//import org.springframework.stereotype.Component;
 //
-//    // Run every Saturday at 12 est
-//    @Scheduled(cron = "0 0 8 ? * SAT")
-//    public void sendSummaryEmail() {
-//        System.out.println("Sending summary email");
-//        commentService.sendAdminSummaryEmail();
-//    }
-}
+//@Component
+//public class SummaryEmailTask {
+//
+////    private final CommentService commentService;
+////
+////    @Inject
+////    public SummaryEmailTask(CommentService commentService) {
+////        this.commentService = commentService;
+////    }
+////
+////    // Run every Saturday at 12 est
+////    @Scheduled(cron = "0 0 8 ? * SAT")
+////    public void sendSummaryEmail() {
+////        System.out.println("Sending summary email");
+////        commentService.sendAdminSummaryEmail();
+////    }
+//}

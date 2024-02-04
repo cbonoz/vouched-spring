@@ -3,6 +3,7 @@ package com.vouched.service;
 import com.vouched.config.AppProperties;
 import com.vouched.dao.UserDao;
 import com.vouched.error.SoftException;
+import com.vouched.service.email.EmailService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,14 +30,15 @@ class EndorsementServiceTest {
 
     @BeforeEach
     void setUp() {
-        endorsementService = new EndorsementService(new DefaultResourceLoader(), userDao, emailService, appProperties);
+        endorsementService =
+                new EndorsementService(
+                        new DefaultResourceLoader(), userDao, emailService, appProperties);
     }
 
     @Test
     void isTrue() {
         assertTrue(true);
     }
-
 
     @Test
     void validateCommentSplitOk() {
@@ -52,19 +54,21 @@ class EndorsementServiceTest {
 
     @Test
     void validateCommentSplitEmpty() {
-        assertThrows(SoftException.class, () -> {
-            String comment = "";
-            endorsementService.validateComment(comment);
-        });
+        assertThrows(
+                SoftException.class,
+                () -> {
+                    String comment = "";
+                    endorsementService.validateComment(comment);
+                });
     }
 
     @Test
     void validateCommentSplitInvalid() {
-        assertThrows(SoftException.class, () -> {
-            String comment = "shit";
-            endorsementService.validateComment(comment);
-        });
+        assertThrows(
+                SoftException.class,
+                () -> {
+                    String comment = "shit";
+                    endorsementService.validateComment(comment);
+                });
     }
-
-
 }

@@ -30,5 +30,5 @@ COPY --from=build /app/build/libs/vouched-1.0.0.jar ./vouched.jar
 EXPOSE 8001
 
 # Define the command to run the application
-CMD ["java", "-jar", "-Dspring.profiles.active=dev", "vouched.jar"]
+CMD ["java", "-jar", "-Dspring.profiles.active=prod", "vouched.jar"]
 

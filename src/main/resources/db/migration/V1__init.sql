@@ -8,12 +8,16 @@ CREATE EXTENSION IF NOT EXISTS citext;
 CREATE TABLE users
 (
     id            UUID        DEFAULT gen_random_uuid() NOT NULL,
-    external_id   text        unique NOT NULL,
+    external_id   text        unique,
     created_at    TIMESTAMPTZ DEFAULT now() NOT NULL,
     updated_at    TIMESTAMPTZ DEFAULT now() NOT NULL,
     deleted_at    TIMESTAMPTZ,
     activated_at  TIMESTAMPTZ,
-    handle       citext UNIQUE,
+    invited_at    TIMESTAMPTZ,
+    image_url     text,
+    first_name    text,
+    last_name     text,
+    handle        citext UNIQUE,
     email         citext UNIQUE,
     PRIMARY KEY (id)
 );
@@ -23,6 +27,7 @@ CREATE TABLE endorsements(
     created_at    TIMESTAMPTZ DEFAULT now() NOT NULL,
     updated_at    TIMESTAMPTZ DEFAULT now() NOT NULL,
     deleted_at    TIMESTAMPTZ,
+    approved_at   TIMESTAMPTZ,
     message text NOT NULL,
     user_name text NOT NULL,
     user_id       UUID        NOT NULL,
@@ -32,15 +37,12 @@ CREATE TABLE endorsements(
     FOREIGN KEY (endorser_id) REFERENCES users (id)
 );
 
-
+-- user indices
 create unique index user_emails on users (email);
 create unique index user_handles on users (handle);
 create unique index user_external_ids on users (external_id);
-create unique index endorsement_user_id_endorser_id on endorsements (user_id, endorser_id);
-create index endorsement_user_id on endorsements(user_id);
-create index endorsement_endorser_id on endorsements(endorser_id);
 
-
-
+-- endorsement indices
+create unique index endorsement_user_id_endorser_id on endorsements (user_id, endorser_id, approved_at);
 
 end;

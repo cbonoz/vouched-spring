@@ -3,6 +3,7 @@ package com.vouched.service;
 import com.vouched.config.AppProperties;
 import com.vouched.dao.UserDao;
 import com.vouched.error.SoftException;
+import com.vouched.service.email.EmailService;
 import io.netty.util.internal.StringUtil;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.core.io.Resource;

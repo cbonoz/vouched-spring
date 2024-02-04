@@ -1,9 +1,8 @@
 package com.vouched.model.dto;
 
-import lombok.Data;
-
-import javax.annotation.Nullable;
 import java.util.UUID;
+import javax.annotation.Nullable;
+import lombok.Data;
 
 @Data
 public class CommentRating {

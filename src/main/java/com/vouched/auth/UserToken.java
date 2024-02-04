@@ -9,14 +9,17 @@ public record UserToken(
         String email,
         String imageUrl,
         String externalId,
-        String name,
+        String firstName,
+
+        String lastName,
         String handle,
 
         Date activatedAt,
         Map<String, Object> metadata
 ) {
     // simple constructor
-    public static UserToken createEmailUser(UUID id, String externalId, String email) {
-        return new UserToken(id, email, null, externalId, null, null, null, null);
+    public static UserToken createSuperUserToken(UUID id, String externalId, String email) {
+        return new UserToken(id, email, null, externalId, "Super", "User", null, null, null);
     }
+
 }

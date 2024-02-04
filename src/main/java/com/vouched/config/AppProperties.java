@@ -21,11 +21,6 @@ public class AppProperties {
     @Value("${app.clerk-secret}")
     public String clerkSecret;
 
-    @Value("${app.mailjet-api-key}")
-    public String mailjetApiKey;
-
-    @Value("${app.mailjet-secret-key}")
-    public String mailjetSecretKey;
-
-
+    @Value("${app.brevo-api-key}")
+    public String brevoApiKey;
 }

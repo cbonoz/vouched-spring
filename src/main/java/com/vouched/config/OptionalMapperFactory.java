@@ -16,7 +16,8 @@ public class OptionalMapperFactory implements ColumnMapperFactory {
 
     @Override
     public Optional<ColumnMapper<?>> build(Type type, ConfigRegistry config) {
-        if (type instanceof ParameterizedType && Optional.class.equals(((ParameterizedType) type).getRawType())) {
+        if (type instanceof ParameterizedType
+                && Optional.class.equals(((ParameterizedType) type).getRawType())) {
             Type valueType = ((ParameterizedType) type).getActualTypeArguments()[0];
             ColumnMapper<?> valueMapper = config.get(ColumnMappers.class).findFor(valueType).orElse(null);
             return Optional.of(new OptionalMapper(valueMapper));
@@ -32,13 +33,15 @@ public class OptionalMapperFactory implements ColumnMapperFactory {
         }
 
         @Override
-        public Optional<?> map(ResultSet r, int columnNumber, StatementContext ctx) throws SQLException {
+        public Optional<?> map(ResultSet r, int columnNumber, StatementContext ctx)
+                throws SQLException {
             Object value = valueMapper.map(r, columnNumber, ctx);
             return Optional.ofNullable(value);
         }
 
         @Override
-        public Optional<?> map(ResultSet r, String columnLabel, StatementContext ctx) throws SQLException {
+        public Optional<?> map(ResultSet r, String columnLabel, StatementContext ctx)
+                throws SQLException {
             Object value = valueMapper.map(r, columnLabel, ctx);
             return Optional.ofNullable(value);
         }

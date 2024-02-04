@@ -1,6 +1,6 @@
 package com.vouched.model.dto;
 
-public record CreateEndorsementDto(String message, String email, String name) {
+public record CreateEndorsementDto(String message, String handle) {
 
     public CreateEndorsementDto {
         if (message == null || message.isEmpty()) {

@@ -1,9 +1,8 @@
 package com.vouched.model.domain;
 
-import lombok.Data;
-
 import java.util.Date;
 import java.util.UUID;
+import lombok.Data;
 
 @Data
 public class Endorsement {

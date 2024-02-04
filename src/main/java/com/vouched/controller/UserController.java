@@ -2,18 +2,15 @@ package com.vouched.controller;
 
 import com.vouched.annotation.CurrentUser;
 import com.vouched.auth.UserToken;
-import com.vouched.dao.EndorsementDao;
 import com.vouched.dao.UserDao;
-import com.vouched.error.SoftException;
-import com.vouched.model.domain.Endorsement;
-import com.vouched.model.domain.User;
-import com.vouched.model.dto.CreateEndorsementDto;
+import com.vouched.model.domain.VouchedUser;
+import com.vouched.service.email.EmailService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 import static com.vouched.util.StringUtil.isValidEmail;
 
@@ -22,67 +19,58 @@ import static com.vouched.util.StringUtil.isValidEmail;
 public class UserController {
 
     private final UserDao userDao;
-    private final EndorsementDao endorsementDao;
+    private EmailService emailService;
 
     @Inject
-    public UserController(UserDao userDao, EndorsementDao endorsementDao) {
+    public UserController(UserDao userDao, EmailService emailService) {
         this.userDao = userDao;
-        this.endorsementDao = endorsementDao;
+        this.emailService = emailService;
     }
 
-
     @GetMapping("")
-    public ResponseEntity<User> getUser(@CurrentUser UserToken user, @RequestParam("email") String email) {
-        // check if valid email
-        if (!isValidEmail(email)) {
+    public ResponseEntity<VouchedUser> getUser(@RequestParam("email") String email,
+                                               @RequestParam("handle") String handle) {
+        Optional<VouchedUser> optionalUser;
+        if (isValidEmail(email)) {
+            optionalUser = userDao.getUserByEmail(email);
+        } else if (handle != null && !handle.isEmpty()) {
+            optionalUser = userDao.getUserByHandle(handle);
+        } else {
             return ResponseEntity.badRequest().build();
         }
-        Optional<User> optionalUser = userDao.getUserByEmail(email);
         return optionalUser.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-
-    @PostMapping("/endorse")
-    public ResponseEntity<Endorsement> endorseUser(@RequestBody CreateEndorsementDto dto, @CurrentUser UserToken user) {
+    // Get user by token
+    @GetMapping("/me")
+    public ResponseEntity<UserToken> getUser(@CurrentUser UserToken user) {
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
-        Optional<User> optionalUserToEndorse = userDao.getUserByEmail(dto.email());
-        if (optionalUserToEndorse.isEmpty()) {
-            // Create
-            UUID createdId = userDao.createUserFromEmail(dto.email(), dto.email()).orElseThrow(() -> new SoftException("Unable to create user"));
-            optionalUserToEndorse = userDao.getUserById(createdId);
-        }
-
-        if (optionalUserToEndorse.isEmpty()) {
-            throw new RuntimeException("Unable to create user");
-        }
-
-        UUID endorsementId = endorsementDao.createEndorsement(
-                user.id(),
-                optionalUserToEndorse.get().id(),
-                dto.message()
-        );
-        return ResponseEntity.ok(endorsementDao.getEndorsement(endorsementId));
+        return ResponseEntity.ok(user);
     }
 
-    @DeleteMapping("/endorse/{endorsementId}")
-    public ResponseEntity<Void> deleteEndorsement(@PathVariable UUID endorsementId, @CurrentUser UserToken user) {
-        if (user == null) {
-            return ResponseEntity.notFound().build();
+    @GetMapping("/invite")
+    public ResponseEntity<String> inviteUser(@CurrentUser UserToken user, @RequestParam("email") String email) {
+        if (!isValidEmail(email)) {
+            return ResponseEntity.badRequest().build();
         }
-        // Check if user is owner of endorsement
-        Endorsement endorsement = endorsementDao.getEndorsement(endorsementId);
-        if (endorsement == null) {
-            return ResponseEntity.notFound().build();
-        }
+        Map<String, Object> templateMap = Map.of();
+        emailService.sendUserInvite(email, templateMap);
 
-        if (!endorsement.getEndorserId().equals(user.id())) {
-            return ResponseEntity.status(403).build();
-        }
 
-        endorsementDao.deleteEndorsement(endorsementId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Invited user with email: " + email);
+    }
+
+    @PostMapping("/request")
+    public ResponseEntity<String> requestUser(@CurrentUser UserToken user, @RequestParam("email") String email) {
+        if (!isValidEmail(email)) {
+            return ResponseEntity.badRequest().build();
+        }
+        Map<String, Object> templateMap = Map.of();
+        emailService.sendUserRequest(email, templateMap);
+
+        return ResponseEntity.ok("Requested user with email: " + email);
     }
 
 }

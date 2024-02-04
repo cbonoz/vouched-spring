@@ -23,7 +23,6 @@ import javax.sql.DataSource;
 public class MainConfig {
 
     // Hikari
-
     @Bean
     @Qualifier("main")
     public DataSource dataSource(
@@ -42,37 +41,33 @@ public class MainConfig {
     }
 
     @Bean
-    public Jdbi jdbi(
-            @Qualifier("main")
-            DataSource ds) {
+    public Jdbi jdbi(@Qualifier("main") DataSource ds) {
         TransactionAwareDataSourceProxy proxy = new TransactionAwareDataSourceProxy(ds);
         Jdbi jdbi = Jdbi.create(proxy);
 
         // Install standard psql plugins with json parsing
-        jdbi.installPlugin(new JdbiPlugin() {
-            @Override
-            public void customizeJdbi(Jdbi jdbi) {
-                // Handle absent value as optional if single result
+        jdbi.installPlugin(
+                new JdbiPlugin() {
+                    @Override
+                    public void customizeJdbi(Jdbi jdbi) {
+                        // Handle absent value as optional if single result
 
+                        jdbi.installPlugin(new PostgresPlugin());
+                        jdbi.installPlugin(new SqlObjectPlugin());
+                        jdbi.installPlugin(new Jackson2Plugin());
+                        jdbi.registerRowMapper(new RosettaRowMapperFactory());
 
-                jdbi.installPlugin(new PostgresPlugin());
-                jdbi.installPlugin(new SqlObjectPlugin());
-                jdbi.installPlugin(new Jackson2Plugin());
-                jdbi.registerRowMapper(new RosettaRowMapperFactory());
+                        // Classes
+                        //                jdbi.registerRowMapper(factory(Endorsement.class));
+                        //                jdbi.registerRowMapper(factory(User.class));
+                        //                jdbi.registerRowMapper(factory(CommentRating.class));
+                        //                jdbi.registerRowMapper(factory(CommentResponse.class));
+                        //                jdbi.registerRowMapper(factory(FlaggedComment.class));
 
-
-                // Classes
-//                jdbi.registerRowMapper(factory(Endorsement.class));
-//                jdbi.registerRowMapper(factory(User.class));
-//                jdbi.registerRowMapper(factory(CommentRating.class));
-//                jdbi.registerRowMapper(factory(CommentResponse.class));
-//                jdbi.registerRowMapper(factory(FlaggedComment.class));
-
-                // support optional
-                jdbi.registerColumnMapper(new OptionalMapperFactory());
-
-            }
-        });
+                        // support optional
+                        jdbi.registerColumnMapper(new OptionalMapperFactory());
+                    }
+                });
         return jdbi;
     }
 

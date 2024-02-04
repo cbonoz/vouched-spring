@@ -3,7 +3,7 @@ package com.vouched.model.domain;
 import java.util.Date;
 import java.util.UUID;
 
-public record User(
+public record VouchedUser(
         UUID id,
         String externalId,
         String email,
@@ -11,4 +11,5 @@ public record User(
         Date activatedAt,
         Date createdAt,
         Date updatedAt) {
-};
+}
+;

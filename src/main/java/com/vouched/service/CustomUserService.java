@@ -3,9 +3,9 @@ package com.vouched.service;
 
 import com.vouched.auth.UserToken;
 import com.vouched.dao.UserDao;
-import com.vouched.model.domain.EmailEntry;
-import com.vouched.model.domain.ClerkUser;
-import com.vouched.model.domain.User;
+import com.vouched.model.domain.VouchedUser;
+import io.github.zzhorizonzz.client.models.EmailAddress;
+import io.github.zzhorizonzz.client.models.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -26,35 +26,33 @@ public class CustomUserService {
     }
 
     public UserToken loadUserByUsername(String username) throws UsernameNotFoundException {
-        // Load user information from your data source based on the username
-        // Create a UserDetails object and return it
-        // Example:
 
-        Optional<ClerkUser> userTokenOptional = clerkService.getClerkUser(username);
+        Optional<User> userTokenOptional = clerkService.getClerkUser(username);
         if (userTokenOptional.isEmpty()) {
             throw new UsernameNotFoundException("User not found");
         }
 
-        ClerkUser userToken = userTokenOptional.get();
-        EmailEntry emailEntry = userToken.emailAddresses().get(0);
+        User userToken = userTokenOptional.get();
+        EmailAddress emailEntry = userToken.getEmailAddresses().get(0);
 
         // If user with email isn't present in DB, create this user.
-        User createdUser = userDao.getUserByEmail(emailEntry.emailAddress())
+        VouchedUser createdVouchedUser = userDao.getUserByEmail(emailEntry.getEmailAddress())
                 .orElseGet(() -> {
-                    UUID id = userDao.createUserFromEmail(emailEntry.emailAddress(), username).orElseThrow();
+                    UUID id = userDao.createBaseUser(userToken.getFirstName(), userToken.getLastName(), userToken.getImageUrl(), emailEntry.getEmailAddress(), username).orElseThrow();
                     return userDao.getUserById(id).orElseThrow();
                 });
 
 
         return new UserToken(
-                createdUser.id(),
-                emailEntry.emailAddress(),
-                userToken.imageUrl(),
-                userToken.externalId(),
-                userToken.firstName() + " " + userToken.lastName(),
-                createdUser.handle(),
-                createdUser.activatedAt(),
-                userToken.privateMetadata()
+                createdVouchedUser.id(),
+                emailEntry.getEmailAddress(),
+                userToken.getImageUrl(),
+                userToken.getUsername(),
+                userToken.getFirstName(),
+                userToken.getLastName(),
+                createdVouchedUser.handle(),
+                createdVouchedUser.activatedAt(),
+                userToken.getPrivateMetadata().getAdditionalData()
         );
     }
 }

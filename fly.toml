@@ -7,23 +7,23 @@ app = "vouched"
 primary_region = "bos"
 
 [env]
-  DOCKER_BUILDKIT = "0"
+DOCKER_BUILDKIT = "0"
 
 [build]
-  dockerfile = "Dockerfile.dev"
+dockerfile = "Dockerfile.prod"
 
 [deploy]
-  strategy = "rolling"
-  max_unavailable = 1
+strategy = "rolling"
+max_unavailable = 1
 
 [http_service]
-  internal_port = 8001
-  force_https = true
-  auto_stop_machines = false # true if you want fly to stop idle instances.
-  auto_start_machines = false
+internal_port = 8001
+force_https = true
+auto_stop_machines = false # true if you want fly to stop idle instances.
+auto_start_machines = false
 
-  [[services.ports]]
-    handlers = ["tls"]
-    start_port = 8001
-    end_port = 8001
+[[services.ports]]
+handlers = ["tls"]
+start_port = 8001
+end_port = 8001
 
