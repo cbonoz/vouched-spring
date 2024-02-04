@@ -9,7 +9,7 @@ build/
 !**/src/main/**/application.properties
 !**/src/main/**/application-*.properties
 application*.properties
-
+public-*.pem
 
 google.json
 
