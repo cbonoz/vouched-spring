@@ -21,7 +21,7 @@
     </p>
 
     <p>
-        <a href="${signUpLink}"
+        <a href="${signupUrl}"
            style="display: inline-block; padding: 10px 20px; background-color: #007BFF; color: #fff; text-decoration: none; border-radius: 5px;">Complete
             Registration</a>
     </p>

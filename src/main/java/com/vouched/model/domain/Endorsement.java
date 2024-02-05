@@ -6,10 +6,10 @@ import lombok.Data;
 
 @Data
 public class Endorsement {
-    UUID id;
-    UUID userId;
-    UUID endorserId;
-    String message;
-    Date createdAt;
-    Date updatedAt;
+
+  UUID id;
+  UUID userId;
+  UUID endorserId;
+  String message;
+  Date createdAt;
 }

@@ -8,7 +8,9 @@ import com.vouched.error.SoftException;
 import com.vouched.model.domain.Endorsement;
 import com.vouched.model.domain.VouchedUser;
 import com.vouched.model.dto.CreateEndorsementDto;
+import com.vouched.model.param.NewEndorsement;
 import com.vouched.service.EndorsementService;
+import com.vouched.service.email.EmailService;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,13 +32,15 @@ public class EndorsementController {
 
   private final UserDao userDao;
   private final EndorsementDao endorsementDao;
+  private final EmailService emailService;
   private EndorsementService endorsementService;
 
   @Inject
   public EndorsementController(UserDao userDao, EndorsementDao endorsementDao,
-      EndorsementService endorsementService) {
+      EmailService emailService, EndorsementService endorsementService) {
     this.userDao = userDao;
     this.endorsementDao = endorsementDao;
+    this.emailService = emailService;
     this.endorsementService = endorsementService;
   }
 
@@ -103,11 +107,22 @@ public class EndorsementController {
 
     endorsementService.validateComment(dto.message());
 
+    VouchedUser endorsedUser = optionalUserToEndorse.get();
+
     UUID endorsementId = endorsementDao.createEndorsement(
+        endorsedUser.id(),
         user.id(),
-        optionalUserToEndorse.get().id(),
         dto.message()
     );
+
+    NewEndorsement newEndorsement = new NewEndorsement(
+        endorsedUser.getFullName(),
+        user.getFullName(),
+        dto.message(),
+        endorsedUser.handle()
+    );
+    emailService.sendEndorsementEmail(endorsedUser.email(), newEndorsement);
+
     return ResponseEntity.ok(endorsementDao.getEndorsement(endorsementId).orElseThrow());
   }
 

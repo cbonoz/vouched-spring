@@ -15,5 +15,8 @@ public record VouchedUser(
     Date createdAt,
     Date updatedAt) {
 
+  public String getFullName() {
+    return firstName + " " + lastName;
+  }
+
 }
-;

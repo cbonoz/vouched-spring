@@ -10,11 +10,11 @@
 <div>
 
     <h2>
-        To Vouched,
+    Hi there!
     </h2>
 
     <p>
-        ${name} (${email}) has requested to join Vouched. Reach out or share with them this link ${signUpLink}/sign-up!
+        ${name} (${email}) requested to join the Vouched platform. Reach out or share with them this link ${signupUrl}/sign-up!
     </p>
 
     <p>Thank you!</p>

@@ -3,6 +3,7 @@ package com.vouched.service.email;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vouched.config.AppProperties;
 import com.vouched.model.TemplateFile;
+import com.vouched.model.param.NewEndorsement;
 import com.vouched.model.param.UserInvite;
 import com.vouched.model.param.UserRequest;
 import java.util.List;
@@ -45,15 +46,25 @@ public class EmailService {
 
   public void sendUserInvite(UserInvite userInvite) {
     Map<String, Object> params = objectMapper.convertValue(userInvite, Map.class);
-    params.put("signUpLink", getSignUpLink());
+    params.put("signupUrl", getSignupUrl());
     String template = templateService.getTemplate(
         TemplateFile.USER_INVITE.getTemplateName(), params);
-    sendEmail("You've been invited to Vouched", template, List.of(userInvite.email()));
+    sendEmail("You've been invited to Vouched!", template,
+        List.of(userInvite.inviteeEmail()));
+  }
+
+  public void sendEndorsementEmail(String receiverEmail, NewEndorsement newEndorsement) {
+    Map<String, Object> params = objectMapper.convertValue(newEndorsement, Map.class);
+    params.put("profileUrl", getProfileUrl(newEndorsement.handle()));
+    String template = templateService.getTemplate(
+        TemplateFile.NEW_ENDORSEMENT.getTemplateName(), params);
+    sendEmail("You received a new endorsement on Vouched!", template,
+        List.of(receiverEmail));
   }
 
   public void sendUserRequest(UserRequest userRequest) {
     Map<String, Object> params = objectMapper.convertValue(userRequest, Map.class);
-    params.put("signUpLink", getSignUpLink());
+    params.put("signupUrl", getSignupUrl());
     String template = templateService.getTemplate(
         TemplateFile.USER_REQUEST.getTemplateName(), params);
     sendEmail("User requested to join Vouched", template, appProperties.adminEmails);
@@ -83,8 +94,12 @@ public class EmailService {
     return createSmtpEmail.getMessageId();
   }
 
-  private String getSignUpLink() {
+  private String getSignupUrl() {
     return String.format("https://%s/sign-up", appProperties.appDomain);
+  }
+
+  private String getProfileUrl(String handle) {
+    return String.format("https://%s/profile/%s", appProperties.appDomain, handle);
   }
 
 }

@@ -43,6 +43,6 @@ create unique index user_handles on users (handle);
 create unique index user_external_ids on users (external_id);
 
 -- endorsement indices
-create unique index endorsement_user_id_endorser_id on endorsements (user_id, endorser_id, approved_at);
+create unique index endorsement_user_id_endorser_id on endorsements (user_id, endorser_id);
 
 end;
