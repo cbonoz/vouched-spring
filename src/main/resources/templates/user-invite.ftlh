@@ -7,13 +7,13 @@
 </head>
 <body>
 
-<div style="max-width: 400px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; text-align: center;">
+<div>
 
-    <h2>You've been invited to join Vouched (usevouched.com)!</h2>
-
-    <p>
+    <h2>
         Dear ${inviteeName},
-    </p>
+    </h2>
+
+    <p>You've been invited to join Vouched (usevouched.com)!</p>
 
     <p>
         You have been invited by ${inviterName} to join the Vouched platform. Click the link below to complete your
@@ -21,13 +21,9 @@
     </p>
 
     <p>
-        <a href="${registrationLink}"
+        <a href="${signUpLink}"
            style="display: inline-block; padding: 10px 20px; background-color: #007BFF; color: #fff; text-decoration: none; border-radius: 5px;">Complete
             Registration</a>
-    </p>
-
-    <p>
-        If you have any questions, feel free to contact us at ${supportEmail}.
     </p>
 
     <p>Thank you!</p>

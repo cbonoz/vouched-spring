@@ -7,24 +7,14 @@
 </head>
 <body>
 
-<div style="max-width: 400px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif; text-align: center;">
+<div>
 
-    <p>
+    <h2>
         To Vouched,
-    </p>
+    </h2>
 
     <p>
-        ${name} (${email}) has requested to join Vouched. Click the link below to complete your registration:
-    </p>
-
-    <p>
-        <a href="${registrationLink}"
-           style="display: inline-block; padding: 10px 20px; background-color: #007BFF; color: #fff; text-decoration: none; border-radius: 5px;">Complete
-            Registration</a>
-    </p>
-
-    <p>
-        If you have any questions, feel free to contact us at ${supportEmail}.
+        ${name} (${email}) has requested to join Vouched. Reach out or share with them this link ${signUpLink}/sign-up!
     </p>
 
     <p>Thank you!</p>
