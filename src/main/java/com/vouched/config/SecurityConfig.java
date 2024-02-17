@@ -46,7 +46,7 @@ public class SecurityConfig {
         .requestMatchers("/public/**").permitAll()
         .requestMatchers("/user/request").permitAll()
         .requestMatchers("/user/clerk/webhook").permitAll()
-        .requestMatchers("/endorse/list").permitAll()
+        .requestMatchers("/endorsements/list/handle").permitAll()
         .requestMatchers("/admin/up").permitAll()
         .anyRequest().authenticated()
         // Add your authorization rules here

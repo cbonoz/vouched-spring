@@ -1,8 +1,9 @@
 package com.vouched.config;
 
 import com.hubspot.rosetta.jdbi3.RosettaRowMapperFactory;
-import com.vouched.dao.EndorsementDao;
 import com.vouched.dao.UserDao;
+import com.vouched.dao.endorsement.AccessDao;
+import com.vouched.dao.endorsement.EndorsementDao;
 import com.zaxxer.hikari.HikariDataSource;
 import javax.sql.DataSource;
 import org.jdbi.v3.core.Jdbi;
@@ -55,13 +56,6 @@ public class MainConfig {
             jdbi.installPlugin(new SqlObjectPlugin());
             jdbi.installPlugin(new Jackson2Plugin());
             jdbi.registerRowMapper(new RosettaRowMapperFactory());
-
-            // Classes
-            //                jdbi.registerRowMapper(factory(Endorsement.class));
-            //                jdbi.registerRowMapper(factory(User.class));
-            //                jdbi.registerRowMapper(factory(CommentRating.class));
-            //                jdbi.registerRowMapper(factory(CommentResponse.class));
-            //                jdbi.registerRowMapper(factory(FlaggedComment.class));
             jdbi.registerColumnMapper(new OptionalMapperFactory());
           }
         });
@@ -72,6 +66,12 @@ public class MainConfig {
   public EndorsementDao endorsementDao(Jdbi jdbi) {
     return jdbi.onDemand(EndorsementDao.class);
   }
+
+  @Bean
+  public AccessDao endorsementAccessDao(Jdbi jdbi) {
+    return jdbi.onDemand(AccessDao.class);
+  }
+
 
   @Bean
   public UserDao userDao(Jdbi jdbi) {

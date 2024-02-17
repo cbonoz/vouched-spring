@@ -1,10 +1,6 @@
 package com.vouched.model.dto;
 
-public record CreateEndorsementDto(String message, String handle) {
+public record CreateEndorsementDto(String message, String firstName, String lastName,
+                                   String relationship) {
 
-    public CreateEndorsementDto {
-        if (message == null || message.isEmpty()) {
-            throw new IllegalArgumentException("message cannot be null");
-        }
-    }
 }

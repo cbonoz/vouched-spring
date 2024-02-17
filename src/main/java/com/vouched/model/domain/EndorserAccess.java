@@ -5,13 +5,15 @@ import java.util.UUID;
 import lombok.Data;
 
 @Data
-public class Endorsement {
+public class EndorserAccess {
 
   UUID id;
   UUID endorserId;
-  String relationship;
-  String firstName;
-  String lastName;
+  UUID requesterId;
+  String requesterEmail;
   String message;
   Date createdAt;
+  Date approvedAt;
+  Date deletedAt;
+
 }

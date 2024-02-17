@@ -1,45 +1,36 @@
 package com.vouched.service;
 
 
-import com.microsoft.kiota.authentication.ApiKeyAuthenticationProvider;
-import com.microsoft.kiota.authentication.ApiKeyLocation;
-import com.microsoft.kiota.http.OkHttpRequestAdapter;
 import com.vouched.config.AppProperties;
-import io.github.zzhorizonzz.client.models.User;
-import io.github.zzhorizonzz.sdk.ClerkClient;
-import io.github.zzhorizonzz.sdk.user.request.UpdateUserRequest;
-import org.springframework.stereotype.Component;
-
-import javax.inject.Inject;
+import com.vouched.model.domain.ClerkUser;
 import java.util.Optional;
+import javax.inject.Inject;
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Component
 public class ClerkService {
 
-    private final ClerkClient clerkClient;
+  private final WebClient webClient;
 
-    // https://www.baeldung.com/spring-5-webclient
-    @Inject
-    public ClerkService(AppProperties appProperties) {
-        final ApiKeyAuthenticationProvider authProvider = new ApiKeyAuthenticationProvider(appProperties.clerkSecret, "authorization", ApiKeyLocation.HEADER, appProperties.clerkUrl);
-        final OkHttpRequestAdapter adapter = new OkHttpRequestAdapter(authProvider);
-        this.clerkClient = new ClerkClient(adapter);
-    }
+  private final AppProperties appProperties;
 
-    public Optional<User> getClerkUser(String username) {
-        return Optional.ofNullable(clerkClient.getUserService().read(username));
-//        return webClient.get()
-//                .uri("/users/" + username)
-//                .header("Authorization", "Bearer " + appProperties.clerkSecret)
-//                .retrieve()
-//                .bodyToMono(ClerkUser.class)
-//                // Log error and return optional empty
-//                .blockOptional();
-    }
+  // https://www.baeldung.com/spring-5-webclient
+  @Inject
+  public ClerkService(AppProperties appProperties) {
+    this.appProperties = appProperties;
+    this.webClient = WebClient.builder().baseUrl(appProperties.clerkUrl).build();
+  }
 
-    public User updateUser(String userId, UpdateUserRequest updateUserRequest) {
-        return clerkClient.getUserService().update(userId, updateUserRequest);
-    }
+  public Optional<ClerkUser> getClerkUser(String username) {
+    return webClient.get()
+        .uri("/users/" + username)
+        .header("Authorization", "Bearer " + appProperties.clerkSecret)
+        .retrieve()
+        .bodyToMono(ClerkUser.class)
+        // Log error and return optional empty
+        .blockOptional();
+  }
 
 
 }

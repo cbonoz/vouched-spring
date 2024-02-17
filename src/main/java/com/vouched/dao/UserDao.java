@@ -13,23 +13,23 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 public interface UserDao {
 
   @SqlQuery("SELECT * FROM users WHERE email = :emailAddress")
-  Optional<VouchedUser> getUserByEmail(String emailAddress);
+  Optional<VouchedUser> getUserByEmail(@Bind String emailAddress);
 
   @SqlUpdate(
-      "INSERT INTO users (first_name, last_name, image_url, email, external_id) VALUES (:firstName, :lastName, :imageUrl, :email, :externalId) on conflict do nothing")
+      "INSERT INTO users (first_name, last_name, image_url, email, external_id) VALUES (:firstName, :lastName, :imageUrl, :email, :externalId) returning *")
   @GetGeneratedKeys
-  Optional<UUID> createBaseUser(@Bind String firstName, @Bind String lastName,
+  UUID createBaseUser(@Bind String firstName, @Bind String lastName,
       @Bind String imageUrl, @Bind String email, @Bind String externalId);
 
   @SqlQuery("SELECT * FROM users WHERE id = :id")
-  Optional<VouchedUser> getUserById(UUID id);
+  Optional<VouchedUser> getUserById(@Bind UUID id);
 
   // get user by external
   @SqlQuery("SELECT * FROM users WHERE external_id = :externalId")
-  Optional<VouchedUser> getUserByExternalId(String externalId);
+  Optional<VouchedUser> getUserByExternalId(@Bind String externalId);
 
   @SqlQuery("SELECT * FROM users WHERE handle = :handle")
-  Optional<VouchedUser> getUserByHandle(String handle);
+  Optional<VouchedUser> getUserByHandle(@Bind String handle);
 
   @SqlUpdate("UPDATE users SET first_name = :firstName, last_name = :lastName, image_url = :imageUrl WHERE external_id = :externalId")
   void updateUser(@BindWithRosetta UpdateVouchedUser user);
