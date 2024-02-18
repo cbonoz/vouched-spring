@@ -6,7 +6,8 @@ import com.vouched.annotation.CurrentUser;
 import com.vouched.auth.UserToken;
 import com.vouched.dao.UserDao;
 import com.vouched.error.SoftException;
-import com.vouched.model.domain.UpdateVouchedUser;
+import com.vouched.model.domain.ClerkUpdateUserRequest;
+import com.vouched.model.domain.UpdateUserRequest;
 import com.vouched.model.domain.VouchedUser;
 import com.vouched.model.dto.UserWebhookEvent;
 import com.vouched.model.dto.UserWebhookEvent.Data;
@@ -61,7 +62,7 @@ public class UserController {
   }
 
   @PatchMapping("/clerk/webhook")
-  public ResponseEntity<UpdateVouchedUser> updateUser(
+  public ResponseEntity<ClerkUpdateUserRequest> updateUser(
       @RequestBody UserWebhookEvent userWebhookEvent
   ) {
     LOG.info("Received user webhook event: {} {}", userWebhookEvent.type(),
@@ -71,23 +72,31 @@ public class UserController {
     }
 
     Data data = userWebhookEvent.data();
-    UpdateVouchedUser updateVouchedUser = new UpdateVouchedUser(
+    ClerkUpdateUserRequest clerkUpdateUserRequest = new ClerkUpdateUserRequest(
         data.id(),
         data.first_name(),
         data.last_name(),
         data.profile_image_url()
     );
-    userDao.updateUser(updateVouchedUser);
-    return ResponseEntity.ok(updateVouchedUser);
+    userDao.updateUser(clerkUpdateUserRequest);
+    return ResponseEntity.ok(clerkUpdateUserRequest);
   }
 
   // Get user by token
   @GetMapping("/me")
-  public ResponseEntity<UserToken> getUser(@CurrentUser UserToken user) {
+  public ResponseEntity<VouchedUser> getUser(@CurrentUser UserToken user) {
     if (user == null) {
       return ResponseEntity.notFound().build();
     }
-    return ResponseEntity.ok(user);
+    return ResponseEntity.ok(userDao.getUserById(user.id()).orElseThrow());
+  }
+
+  @PatchMapping("/me")
+  public ResponseEntity<VouchedUser> updateUser(@CurrentUser UserToken user,
+      @RequestBody UpdateUserRequest updateUserRequest) {
+    updateUserRequest.setId(Optional.of(user.id()));
+    userDao.updateUser(updateUserRequest);
+    return ResponseEntity.ok(userDao.getUserById(user.id()).orElseThrow());
   }
 
   @PostMapping("/invite")

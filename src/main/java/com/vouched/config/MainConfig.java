@@ -1,9 +1,15 @@
 package com.vouched.config;
 
+import com.hubspot.rosetta.jdbi3.RosettaObjectMapper;
 import com.hubspot.rosetta.jdbi3.RosettaRowMapperFactory;
 import com.vouched.dao.UserDao;
 import com.vouched.dao.endorsement.AccessDao;
 import com.vouched.dao.endorsement.EndorsementDao;
+import com.vouched.model.domain.ClerkUpdateUserRequest;
+import com.vouched.model.domain.Endorsement;
+import com.vouched.model.domain.EndorserAccess;
+import com.vouched.model.domain.UpdateUserRequest;
+import com.vouched.model.domain.VouchedUser;
 import com.zaxxer.hikari.HikariDataSource;
 import javax.sql.DataSource;
 import org.jdbi.v3.core.Jdbi;
@@ -41,7 +47,8 @@ public class MainConfig {
   }
 
   @Bean
-  public Jdbi jdbi(@Qualifier("main") DataSource ds) {
+  public Jdbi jdbi(@Qualifier("main") DataSource ds,
+      RosettaObjectMapper rosettaObjectMapper) {
     TransactionAwareDataSourceProxy proxy = new TransactionAwareDataSourceProxy(ds);
     Jdbi jdbi = Jdbi.create(proxy);
 
@@ -55,10 +62,26 @@ public class MainConfig {
             jdbi.installPlugin(new PostgresPlugin());
             jdbi.installPlugin(new SqlObjectPlugin());
             jdbi.installPlugin(new Jackson2Plugin());
+
             jdbi.registerRowMapper(new RosettaRowMapperFactory());
             jdbi.registerColumnMapper(new OptionalMapperFactory());
+
+            // set object mapper
+//            jdbi.getConfig().get(RosettaObjectMapper.class)
+//                .setObjectMapper(rosettaObjectMapper.getObjectMapper());
+
+            jdbi.registerRowMapper(factory(Endorsement.class));
+            jdbi.registerRowMapper(factory(EndorserAccess.class));
+            jdbi.registerRowMapper(factory(VouchedUser.class));
+            jdbi.registerRowMapper(factory(ClerkUpdateUserRequest.class));
+            jdbi.registerRowMapper(factory(UpdateUserRequest.class));
+
+//            jdbi.registerRowMapper(factory(EndorsementDao.class));
+//            jdbi.registerRowMapper(factory(AccessDao.class));
+
           }
         });
+
     return jdbi;
   }
 
@@ -66,6 +89,16 @@ public class MainConfig {
   public EndorsementDao endorsementDao(Jdbi jdbi) {
     return jdbi.onDemand(EndorsementDao.class);
   }
+
+  // object mapper
+  @Bean
+  public RosettaObjectMapper bootstrap() {
+    RosettaObjectMapper rosettaObjectMapper = new RosettaObjectMapper();
+//    rosettaObjectMapper.getObjectMapper()
+//        .registerModule(new LowerCaseWithUnderscoresModule());
+    return rosettaObjectMapper;
+  }
+
 
   @Bean
   public AccessDao endorsementAccessDao(Jdbi jdbi) {

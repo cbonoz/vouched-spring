@@ -5,17 +5,20 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS citext;
 
 
-CREATE TABLE users
-(
+CREATE TABLE users(
     id            UUID        DEFAULT gen_random_uuid() NOT NULL,
     external_id   text        unique,
-    created_at    TIMESTAMPTZ DEFAULT now() NOT NULL,
-    updated_at    TIMESTAMPTZ DEFAULT now() NOT NULL,
-    deleted_at    TIMESTAMPTZ,
+    created_at    TIMESTAMP DEFAULT now() NOT NULL,
+    updated_at    TIMESTAMP DEFAULT now() NOT NULL,
+    deleted_at    TIMESTAMP,
+    activated_at  TIMESTAMP,
     image_url     text,
     first_name    text,
     last_name     text,
     handle        citext UNIQUE,
+    agreement_text text,
+    bio           text,
+    title         text,
     email         citext UNIQUE,
     PRIMARY KEY (id)
 );
@@ -28,9 +31,9 @@ create unique index idx_user_external_ids on users (external_id);
 
 CREATE TABLE endorsements(
     id            UUID        DEFAULT gen_random_uuid() NOT NULL,
-    created_at    TIMESTAMPTZ DEFAULT now() NOT NULL,
-    updated_at    TIMESTAMPTZ DEFAULT now() NOT NULL,
-    deleted_at    TIMESTAMPTZ,
+    created_at    TIMESTAMP DEFAULT now() NOT NULL,
+    updated_at    TIMESTAMP DEFAULT now() NOT NULL,
+    deleted_at    TIMESTAMP,
     message text NOT NULL,
     first_name    citext,
     last_name     citext,
@@ -43,13 +46,12 @@ CREATE TABLE endorsements(
 -- endorsement indices
 create unique index idx_endorsements_by_name on endorsements (first_name, last_name, endorser_id);
 
-
 CREATE TABLE endorser_access(
     id            UUID        DEFAULT gen_random_uuid() NOT NULL,
-    created_at    TIMESTAMPTZ DEFAULT now() NOT NULL,
-    updated_at    TIMESTAMPTZ DEFAULT now() NOT NULL,
-    approved_at   TIMESTAMPTZ,
-    deleted_at    TIMESTAMPTZ,
+    created_at    TIMESTAMP DEFAULT now() NOT NULL,
+    updated_at    TIMESTAMP DEFAULT now() NOT NULL,
+    approved_at   TIMESTAMP,
+    deleted_at    TIMESTAMP,
     message text NOT NULL,
     requester_email citext NOT NULL,
     requester_id UUID,

@@ -1,25 +1,23 @@
 package com.vouched.model.domain;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.Data;
 
 @Data
-public class VouchedUser {
+public class UpdateUserRequest {
 
-  UUID id;
-  String externalId;
-  String email;
+  Optional<UUID> id;
+
   String firstName;
   String lastName;
-  String imageUrl;
-  Date activatedAt;
-  Date createdAt;
-  Date updatedAt;
-
   String handle;
   String title;
   String bio;
   String agreementText;
+  String imageUrl;
+  Date activatedAt;
+
 
 }

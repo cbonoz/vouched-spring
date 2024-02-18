@@ -30,8 +30,6 @@ public class EndorsementController {
 
   private final UserDao userDao;
   private final EndorsementDao endorsementDao;
-  private final EmailService emailService;
-  private final AccessDao accessDao;
   private EndorsementService endorsementService;
 
   @Inject
@@ -40,8 +38,6 @@ public class EndorsementController {
       EndorsementService endorsementService) {
     this.userDao = userDao;
     this.endorsementDao = endorsementDao;
-    this.emailService = emailService;
-    this.accessDao = accessDao;
     this.endorsementService = endorsementService;
   }
 
@@ -59,7 +55,8 @@ public class EndorsementController {
 
     Optional<VouchedUser> userIdMaybe = userDao.getUserByHandle(handleMaybe);
     return userIdMaybe.map(vouchedUser -> ResponseEntity.ok(
-            endorsementDao.getEndorsementsForEndorserId(vouchedUser.id(), newLimit, offset)))
+            endorsementDao.getEndorsementsForEndorserId(vouchedUser.getId(), newLimit,
+                offset)))
         .orElseGet(() -> ResponseEntity.notFound().build());
   }
 
@@ -67,14 +64,15 @@ public class EndorsementController {
   // get endorsements for current user
   public ResponseEntity<List<Endorsement>> getEndorsementsForCurrentUser(
       @CurrentUser UserToken user, @RequestParam("limit") int limit,
-      @RequestParam("offset") int offset) {
+      @RequestParam("offset") Optional<Integer> offsetMaybe) {
     if (user == null) {
       return ResponseEntity.notFound().build();
     }
     int newLimit = Math.max(limit == 0 ? 10 : limit, 1000);
 
     return ResponseEntity.ok(
-        endorsementDao.getEndorsementsForEndorserId(user.id(), newLimit, offset));
+        endorsementDao.getEndorsementsForEndorserId(user.id(), newLimit,
+            offsetMaybe.orElse(0)));
   }
 
 

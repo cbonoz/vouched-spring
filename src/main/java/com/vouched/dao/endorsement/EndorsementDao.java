@@ -13,7 +13,7 @@ public interface EndorsementDao {
 
   // select paginated for user
   @SqlQuery(
-      "SELECT * FROM endorsements WHERE endorse_id = :endorserId ORDER BY created_at DESC LIMIT :limit OFFSET :offset")
+      "SELECT * FROM endorsements WHERE endorser_id = :endorserId ORDER BY created_at DESC LIMIT :limit OFFSET :offset")
   List<Endorsement> getEndorsementsForEndorserId(@Bind UUID endorserId, @Bind int limit,
       @Bind int offset);
 

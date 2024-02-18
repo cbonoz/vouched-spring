@@ -37,28 +37,34 @@ public class CustomUserService {
     String emailAddress = userToken.emailAddresses().get(0).emailAddress();
 
     // If user with email isn't present in DB, create this user.
-    VouchedUser createdUser = userDao.getUserByEmail(emailAddress)
-        .orElseGet(() -> {
-          UUID id = userDao.createBaseUser(emailAddress,
-              userToken.firstName(),
-              userToken.lastName(), userToken.imageUrl(), userToken.externalId());
-          Optional<VouchedUser> userById = userDao.getUserById(id);
+    Optional<VouchedUser> createdUserMaybe = userDao.getUserByEmail(emailAddress);
 
-          if (userById.isEmpty()) {
-            throw new RuntimeException("User not created");
-          }
-          return userById.get();
-        });
+    final VouchedUser createdUser;
+    if (createdUserMaybe.isEmpty()) {
+      UUID id = userDao.createBaseUser(
+          userToken.firstName(),
+          userToken.lastName(), userToken.imageUrl(), emailAddress,
+          userToken.externalId());
+
+      Optional<VouchedUser> userById = userDao.getUserById(id);
+
+      if (userById.isEmpty()) {
+        throw new RuntimeException("User not created");
+      }
+      createdUser = userById.get();
+    } else {
+      createdUser = createdUserMaybe.get();
+    }
 
     return new UserToken(
-        createdUser.id(),
+        createdUser.getId(),
         userToken.externalId(),
         emailAddress,
         userToken.imageUrl(),
         userToken.firstName(),
         userToken.lastName(),
-        createdUser.handle(),
-        createdUser.activatedAt()
+        createdUser.getHandle(),
+        createdUser.getActivatedAt()
     );
   }
 }
