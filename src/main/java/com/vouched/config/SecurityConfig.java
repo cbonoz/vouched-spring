@@ -44,9 +44,8 @@ public class SecurityConfig {
         .csrf().disable()
         .authorizeHttpRequests()
         .requestMatchers("/public/**").permitAll()
-        .requestMatchers("/user/request").permitAll()
+        .requestMatchers("/public/profile/**").permitAll()
         .requestMatchers("/user/clerk/webhook").permitAll()
-        .requestMatchers("/endorsements/list/handle").permitAll()
         .requestMatchers("/admin/up").permitAll()
         .anyRequest().authenticated()
         // Add your authorization rules here

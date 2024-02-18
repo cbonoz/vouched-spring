@@ -57,6 +57,7 @@ public class EmailService {
   public void sendBasicEmail(String receiverEmail, String subject,
       BasicEmailTemplate basicEmailTemplate) {
     Map<String, Object> params = objectMapper.convertValue(basicEmailTemplate, Map.class);
+    params.put("previewText", subject);
     String template = templateService.getTemplate(
         TemplateFile.BASIC_EMAIL.getTemplateName(), params);
     sendEmail(subject, template,

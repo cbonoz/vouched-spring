@@ -6,7 +6,8 @@ public record ProfileResponse(
     PublicProfileUser user,
     List<Endorsement> endorsements,
     int endorsementCount,
-    boolean locked
+    boolean locked,
+    boolean yourPage
 
 ) {
 

@@ -1,6 +1,5 @@
 package com.vouched.auth;
 
-import java.util.Date;
 import java.util.UUID;
 
 public record UserToken(
@@ -11,14 +10,12 @@ public record UserToken(
     String firstName,
 
     String lastName,
-    String handle,
-
-    Date activatedAt
+    String handle
 ) {
 
   // simple constructor
   public static UserToken createSuperUserToken(UUID id, String externalId, String email) {
-    return new UserToken(id, email, null, externalId, "Super", "User", null, null);
+    return new UserToken(id, email, null, externalId, "Super", "User", null);
   }
 
   public String getFullName() {

@@ -12,9 +12,11 @@ import com.vouched.model.domain.PublicProfileUser;
 import com.vouched.model.domain.VouchedUser;
 import com.vouched.model.dto.EndorsementAccessRequest;
 import com.vouched.model.param.BasicEmailTemplate;
+import com.vouched.service.UserInputService;
 import com.vouched.service.email.EmailService;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import javax.inject.Inject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,14 +35,16 @@ public class PublicController {
 
   private final AccessDao accessDao;
   private final EmailService emailService;
+  private final UserInputService userInputService;
 
   @Inject
   public PublicController(UserDao userDao, EndorsementDao endorsementDao,
-      AccessDao accessDao, EmailService emailService) {
+      AccessDao accessDao, EmailService emailService, UserInputService userInputService) {
     this.userDao = userDao;
     this.endorsementDao = endorsementDao;
     this.accessDao = accessDao;
     this.emailService = emailService;
+    this.userInputService = userInputService;
   }
 
   @GetMapping("/up")
@@ -49,7 +53,7 @@ public class PublicController {
   }
 
   @PostMapping("/profile/access")
-  public ResponseEntity<String> requestAccess(
+  public ResponseEntity<EndorserAccess> requestAccess(
       @RequestBody EndorsementAccessRequest endorsementAccessRequest) {
 
     // get user by handle
@@ -60,7 +64,8 @@ public class PublicController {
     }
 
     VouchedUser vouchedUser = handleUserMaybe.get();
-    accessDao.createEndorserAccess(vouchedUser.getId(), endorsementAccessRequest.email(),
+    UUID accessId = accessDao.createEndorserAccess(vouchedUser.getId(),
+        endorsementAccessRequest.email(),
         endorsementAccessRequest.message());
 
     String emailToNotify = vouchedUser.getEmail();
@@ -74,14 +79,14 @@ public class PublicController {
     emailService.sendBasicEmail(emailToNotify, "New Endorsement Access Request",
         basicEmailTemplate);
 
-    return ResponseEntity.ok().body("ok");
+    return ResponseEntity.ok(accessDao.getEndorsementById(accessId));
   }
 
   @GetMapping("/profile")
-  public ResponseEntity<ProfileResponse> getProfile(
+  public ResponseEntity<ProfileResponse> getProfilePage(
       @CurrentUser UserToken user,
       @RequestParam("handle") String handle,
-      @RequestParam("requesterEmail") String requesterEmail
+      @RequestParam("requesterEmail") Optional<String> requesterEmail
   ) {
 
     Optional<VouchedUser> handleUserMaybe = userDao.getUserByHandle(handle);
@@ -91,13 +96,23 @@ public class PublicController {
 
     VouchedUser vouchedUser = handleUserMaybe.get();
 
-    final boolean locked;
+    if (vouchedUser.getActivatedAt() == null) {
+      return ResponseEntity.notFound().build();
+    }
 
-    if (user.id().equals(vouchedUser.getId())) {
+    final boolean locked;
+    boolean yourPage = false;
+
+    if (user != null && user.id().equals(vouchedUser.getId())) {
       locked = false;
+      yourPage = true;
+    } else if (requesterEmail.isEmpty() || requesterEmail.get().isBlank()) {
+      locked = true;
     } else {
+      userInputService.validateEmail(requesterEmail.get());
+
       Optional<EndorserAccess> endorserAccessMaybe = accessDao.getEndorserAccess(
-          vouchedUser.getId(), requesterEmail);
+          vouchedUser.getId(), requesterEmail.get());
       locked = endorserAccessMaybe.isEmpty()
           || endorserAccessMaybe.get().getApprovedAt() == null;
     }
@@ -111,7 +126,8 @@ public class PublicController {
     PublicProfileUser publicProfileUser = PublicProfileUser.fromUser(vouchedUser);
 
     ProfileResponse profileResponse = new ProfileResponse(
-        publicProfileUser, !locked ? endorsements : List.of(), endorsementCount, locked
+        publicProfileUser, !locked ? endorsements : List.of(), endorsementCount, locked,
+        yourPage
     );
 
     return ResponseEntity.ok(profileResponse);

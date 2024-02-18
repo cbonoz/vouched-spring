@@ -7,10 +7,12 @@ import com.vouched.model.domain.EndorserAccess;
 import com.vouched.model.dto.ActionRequest;
 import com.vouched.model.param.BasicEmailTemplate;
 import com.vouched.service.email.EmailService;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.inject.Inject;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/endorser/access")
+@RequestMapping("/endorser/requests")
 public class EndorserAccessController {
 
 
@@ -31,6 +33,17 @@ public class EndorserAccessController {
     this.emailService = emailService;
   }
 
+  // get requests for current user
+  @GetMapping("/list")
+  public ResponseEntity<List<EndorserAccess>> getEndorserAccessForUser(
+      @CurrentUser UserToken user) {
+    if (user == null) {
+      return ResponseEntity.status(401).build();
+    }
+    return ResponseEntity.ok(accessDao.getEndorserAccessForEndorser(user.id(), 100, 0));
+  }
+
+
   @PatchMapping("/{requestId}")
   public ResponseEntity<Void> modifyAccess(@CurrentUser UserToken user,
       @PathVariable UUID requestId, @RequestBody ActionRequest actionRequest) {
@@ -38,7 +51,7 @@ public class EndorserAccessController {
       return ResponseEntity.status(401).build();
     }
     final Optional<EndorserAccess> endorserAccessMaybe;
-    if (actionRequest.action().equals("approve")) {
+    if (actionRequest.action().equals("accept")) {
       endorserAccessMaybe = accessDao.approveEndorserAccess(user.id(), requestId);
     } else if (actionRequest.action().equals("reject")) {
       endorserAccessMaybe = accessDao.deleteEndorserAccess(user.id(), requestId);
@@ -53,10 +66,11 @@ public class EndorserAccessController {
     EndorserAccess endorserAccess = endorserAccessMaybe.get();
 
     String actionMessage =
-        actionRequest.action().equals("approve") ? "approved" : "rejected";
+        actionRequest.action().equals("accept") ? "approved" : "rejected";
     BasicEmailTemplate basicEmailTemplate = new BasicEmailTemplate(
         "Your request to access an endorser has been " + actionMessage + "!",
-        "View profile", "usevouched.com");
+        "View profile", "usevouched.com/profile/" + user.handle());
+
     emailService.sendBasicEmail(endorserAccess.getRequesterEmail(),
         "Vouched Access Update (" + actionMessage + ")", basicEmailTemplate);
 

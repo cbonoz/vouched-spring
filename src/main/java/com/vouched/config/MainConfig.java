@@ -64,11 +64,13 @@ public class MainConfig {
             jdbi.installPlugin(new Jackson2Plugin());
 
             jdbi.registerRowMapper(new RosettaRowMapperFactory());
-            jdbi.registerColumnMapper(new OptionalMapperFactory());
 
             // set object mapper
 //            jdbi.getConfig().get(RosettaObjectMapper.class)
 //                .setObjectMapper(rosettaObjectMapper.getObjectMapper());
+
+            // map null to optionals in columns
+            jdbi.registerColumnMapper(OptionalMapperFactory.INSTANCE);
 
             jdbi.registerRowMapper(factory(Endorsement.class));
             jdbi.registerRowMapper(factory(EndorserAccess.class));

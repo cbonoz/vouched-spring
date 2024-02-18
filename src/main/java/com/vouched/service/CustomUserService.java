@@ -63,8 +63,7 @@ public class CustomUserService {
         userToken.imageUrl(),
         userToken.firstName(),
         userToken.lastName(),
-        createdUser.getHandle(),
-        createdUser.getActivatedAt()
+        createdUser.getHandle()
     );
   }
 }

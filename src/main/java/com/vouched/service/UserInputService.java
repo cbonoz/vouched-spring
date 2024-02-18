@@ -144,4 +144,17 @@ public class UserInputService {
     }
   }
 
+  public void validateEmail(String email) {
+    if (Strings.isBlank(email)) {
+      throw new SoftException("Email cannot be empty");
+    }
+    if (email.length() > 100) {
+      throw new SoftException("Email cannot be longer than 100 characters");
+    }
+
+    if (!email.contains("@")) {
+      throw new SoftException("Email must contain @");
+    }
+  }
+
 }

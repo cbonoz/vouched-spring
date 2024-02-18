@@ -3,6 +3,7 @@ package com.vouched.model.domain;
 public record PublicProfileUser(
     String firstName,
     String lastName,
+    String imageUrl,
     String bio,
     String title,
     String handle,
@@ -13,6 +14,7 @@ public record PublicProfileUser(
     return new PublicProfileUser(
         user.getFirstName(),
         user.getLastName(),
+        user.getImageUrl(),
         user.getBio(),
         user.getTitle(),
         user.getHandle(),

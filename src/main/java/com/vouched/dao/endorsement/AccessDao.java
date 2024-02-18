@@ -14,7 +14,7 @@ public interface AccessDao {
   // select
   @SqlQuery("SELECT * FROM endorser_access WHERE endorser_id = :endorserId and requester_email = :requesterEmail")
   Optional<EndorserAccess> getEndorserAccess(@Bind UUID endorserId,
-      @Bind String requestEmail);
+      @Bind String requesterEmail);
 
   // update
   @SqlQuery("UPDATE endorser_access SET approved_at = now() WHERE endorser_id = :endorserId and id = :id returning *")
@@ -35,11 +35,6 @@ public interface AccessDao {
   List<EndorserAccess> getEndorserAccessForEndorser(@Bind UUID endorserId,
       @Bind int limit, @Bind int offset);
 
-  // select paginated for user
-  @SqlQuery("SELECT * FROM endorser_access WHERE requester_email = :requesterEmail ORDER BY approved_at DESC LIMIT :limit OFFSET :offset")
-  List<EndorserAccess> getEndorserAccessForUser(@Bind String requesterEmail,
-      @Bind int limit,
-      @Bind int offset);
 
   // select paginated for user
   @SqlQuery("SELECT * FROM endorser_access WHERE requester_email = :requesterEmail and endorser_id=:endorserId and approved_at is not null ORDER BY approved_at DESC LIMIT :limit OFFSET :offset")
@@ -48,4 +43,6 @@ public interface AccessDao {
       @Bind int limit, @Bind int offset);
 
 
+  @SqlQuery("SELECT * FROM endorser_access WHERE id = :accessId")
+  EndorserAccess getEndorsementById(@Bind UUID accessId);
 }
