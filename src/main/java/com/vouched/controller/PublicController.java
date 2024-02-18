@@ -1,9 +1,12 @@
 package com.vouched.controller;
 
+import com.vouched.annotation.CurrentUser;
+import com.vouched.auth.UserToken;
 import com.vouched.dao.UserDao;
 import com.vouched.dao.endorsement.AccessDao;
 import com.vouched.dao.endorsement.EndorsementDao;
 import com.vouched.model.domain.Endorsement;
+import com.vouched.model.domain.EndorserAccess;
 import com.vouched.model.domain.ProfileResponse;
 import com.vouched.model.domain.PublicProfileUser;
 import com.vouched.model.domain.VouchedUser;
@@ -76,6 +79,7 @@ public class PublicController {
 
   @GetMapping("/profile")
   public ResponseEntity<ProfileResponse> getProfile(
+      @CurrentUser UserToken user,
       @RequestParam("handle") String handle,
       @RequestParam("requesterEmail") String requesterEmail
   ) {
@@ -85,10 +89,19 @@ public class PublicController {
       return ResponseEntity.notFound().build();
     }
 
-    // TODO: add access check.
-     accessDao.getApprovedEndorserAccessForUser()
-
     VouchedUser vouchedUser = handleUserMaybe.get();
+
+    final boolean locked;
+
+    if (user.id().equals(vouchedUser.getId())) {
+      locked = false;
+    } else {
+      Optional<EndorserAccess> endorserAccessMaybe = accessDao.getEndorserAccess(
+          vouchedUser.getId(), requesterEmail);
+      locked = endorserAccessMaybe.isEmpty()
+          || endorserAccessMaybe.get().getApprovedAt() == null;
+    }
+
     List<Endorsement> endorsements = endorsementDao.getEndorsementsForEndorserId(
         vouchedUser.getId(), 1000, 0
     );

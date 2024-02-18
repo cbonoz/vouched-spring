@@ -42,8 +42,9 @@ public interface AccessDao {
       @Bind int offset);
 
   // select paginated for user
-  @SqlQuery("SELECT * FROM endorser_access WHERE requester_email = :requesterEmail and approved_at is not null ORDER BY approved_at DESC LIMIT :limit OFFSET :offset")
+  @SqlQuery("SELECT * FROM endorser_access WHERE requester_email = :requesterEmail and endorser_id=:endorserId and approved_at is not null ORDER BY approved_at DESC LIMIT :limit OFFSET :offset")
   List<EndorserAccess> getApprovedEndorserAccessForUser(@Bind String requesterEmail,
+      @Bind UUID endorserId,
       @Bind int limit, @Bind int offset);
 
 
