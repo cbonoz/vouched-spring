@@ -1,7 +1,6 @@
 package com.vouched.dao.endorsement;
 
 import com.vouched.model.domain.EndorserAccess;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -18,19 +17,18 @@ public interface AccessDao {
       @Bind String requestEmail);
 
   // update
-  @SqlQuery("UPDATE endorser_access SET approved_at = :approvedAt WHERE endorser_id = :endorserId and requester_id = :requesterId returning *")
-  Optional<EndorserAccess> updateEndorserAccess(@Bind UUID endorserId,
-      @Bind UUID requesterId, @Bind Date approvedAt);
+  @SqlQuery("UPDATE endorser_access SET approved_at = now() WHERE endorser_id = :endorserId and id = :id returning *")
+  Optional<EndorserAccess> approveEndorserAccess(@Bind UUID endorserId,
+      @Bind UUID id);
 
   // delete
-  @SqlQuery("DELETE FROM endorser_access WHERE endorser_id = :endorserId and requester_id = :requesterId returning *")
-  Optional<EndorserAccess> deleteEndorserAccess(@Bind UUID endorserId,
-      @Bind UUID requesterId);
+  @SqlQuery("DELETE FROM endorser_access WHERE endorser_id = :endorserId and id = :id returning *")
+  Optional<EndorserAccess> deleteEndorserAccess(@Bind UUID endorserId, @Bind UUID id);
 
   // create
-  @SqlQuery("INSERT INTO endorser_access(endorser_id, requester_id, approved_at) VALUES(:endorserId, :requesterId, :approvedAt) returning *")
-  UUID createEndorserAccess(@Bind UUID endorserId, @Bind UUID requesterId,
-      @Bind Date approvedAt);
+  @SqlQuery("INSERT INTO endorser_access(endorser_id, requester_email, message) VALUES(:endorserId, :requesterEmail, :message) returning *")
+  UUID createEndorserAccess(@Bind UUID endorserId, @Bind String requesterEmail,
+      @Bind String message);
 
   // select paginated for endorser
   @SqlQuery("SELECT * FROM endorser_access WHERE endorser_id = :endorserId ORDER BY approved_at DESC LIMIT :limit OFFSET :offset")
@@ -38,13 +36,14 @@ public interface AccessDao {
       @Bind int limit, @Bind int offset);
 
   // select paginated for user
-  @SqlQuery("SELECT * FROM endorser_access WHERE requester_id = :requesterId ORDER BY approved_at DESC LIMIT :limit OFFSET :offset")
-  List<EndorserAccess> getEndorserAccessForUser(@Bind UUID requesterId, @Bind int limit,
+  @SqlQuery("SELECT * FROM endorser_access WHERE requester_email = :requesterEmail ORDER BY approved_at DESC LIMIT :limit OFFSET :offset")
+  List<EndorserAccess> getEndorserAccessForUser(@Bind String requesterEmail,
+      @Bind int limit,
       @Bind int offset);
 
   // select paginated for user
-  @SqlQuery("SELECT * FROM endorser_access WHERE requester_id = :requesterId and approved_at is not null ORDER BY approved_at DESC LIMIT :limit OFFSET :offset")
-  List<EndorserAccess> getApprovedEndorserAccessForUser(@Bind UUID requesterId,
+  @SqlQuery("SELECT * FROM endorser_access WHERE requester_email = :requesterEmail and approved_at is not null ORDER BY approved_at DESC LIMIT :limit OFFSET :offset")
+  List<EndorserAccess> getApprovedEndorserAccessForUser(@Bind String requesterEmail,
       @Bind int limit, @Bind int offset);
 
 

@@ -3,6 +3,7 @@ package com.vouched.service.email;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vouched.config.AppProperties;
 import com.vouched.model.TemplateFile;
+import com.vouched.model.param.BasicEmailTemplate;
 import com.vouched.model.param.NewEndorsement;
 import com.vouched.model.param.UserInvite;
 import com.vouched.model.param.UserRequest;
@@ -51,6 +52,15 @@ public class EmailService {
         TemplateFile.USER_INVITE.getTemplateName(), params);
     sendEmail("You've been invited to Vouched!", template,
         List.of(userInvite.inviteeEmail()));
+  }
+
+  public void sendBasicEmail(String receiverEmail, String subject,
+      BasicEmailTemplate basicEmailTemplate) {
+    Map<String, Object> params = objectMapper.convertValue(basicEmailTemplate, Map.class);
+    String template = templateService.getTemplate(
+        TemplateFile.BASIC_EMAIL.getTemplateName(), params);
+    sendEmail(subject, template,
+        List.of(receiverEmail));
   }
 
   public void sendEndorsementEmail(String receiverEmail, NewEndorsement newEndorsement) {
