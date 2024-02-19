@@ -13,9 +13,11 @@ public record UserToken(
     String handle
 ) {
 
+  public static final String SUPER_USER_EXTERNAL_ID = "-1";
+
   // simple constructor
-  public static UserToken createSuperUserToken(UUID id, String externalId, String email) {
-    return new UserToken(id, email, null, externalId, "Super", "User", null);
+  public static UserToken createSuperUserToken(UUID id, String email) {
+    return new UserToken(id, SUPER_USER_EXTERNAL_ID, email, null, "Super", "User", null);
   }
 
   public String getFullName() {

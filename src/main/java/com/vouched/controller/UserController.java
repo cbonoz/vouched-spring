@@ -95,10 +95,12 @@ public class UserController {
   public ResponseEntity<VouchedUser> updateUser(@CurrentUser UserToken user,
       @RequestBody UpdateUserRequest updateUserRequest) {
     updateUserRequest.setId(Optional.of(user.id()));
+    updateUserRequest.setExternalId(Optional.of(user.externalId()));
     String currentImageUrl = updateUserRequest.getImageUrl();
     if (currentImageUrl == null || !currentImageUrl.equals(user.imageUrl())) {
       updateUserRequest.setImageUrl(user.imageUrl());
     }
+    // check external id
     userDao.updateUser(updateUserRequest);
     return ResponseEntity.ok(userDao.getUserById(user.id()).orElseThrow());
   }

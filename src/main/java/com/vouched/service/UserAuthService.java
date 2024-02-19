@@ -12,13 +12,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CustomUserService {
+public class UserAuthService {
 
   private final ClerkService clerkService;
   private final UserDao userDao;
 
   @Inject
-  public CustomUserService(ClerkService clerkService, UserDao userDao) {
+  public UserAuthService(ClerkService clerkService, UserDao userDao) {
     this.clerkService = clerkService;
     this.userDao = userDao;
   }

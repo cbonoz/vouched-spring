@@ -8,6 +8,7 @@ import lombok.Data;
 public class UpdateUserRequest {
 
   Optional<UUID> id;
+  Optional<String> externalId;
 
   String firstName;
   String lastName;

@@ -6,7 +6,7 @@ import com.nimbusds.jwt.SignedJWT;
 import com.vouched.dao.UserDao;
 import com.vouched.error.SoftException;
 import com.vouched.model.domain.VouchedUser;
-import com.vouched.service.CustomUserService;
+import com.vouched.service.UserAuthService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,7 +24,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 public class AuthTokenFilter extends OncePerRequestFilter {
 
-  private final CustomUserService customUserService;
+  private final UserAuthService userAuthService;
   private final UserDao userDao;
   private final RSASSAVerifier verifier;
 
@@ -33,9 +33,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
   private String superToken;
 
   @Inject
-  public AuthTokenFilter(CustomUserService customUserService, UserDao userDao,
+  public AuthTokenFilter(UserAuthService userAuthService, UserDao userDao,
       RSASSAVerifier verifier) {
-    this.customUserService = customUserService;
+    this.userAuthService = userAuthService;
     this.userDao = userDao;
     this.verifier = verifier;
   }
@@ -77,7 +77,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
       if (username != null
           && SecurityContextHolder.getContext().getAuthentication() == null) {
-        UserToken user = customUserService.loadUserByUsername(username);
+        UserToken user = userAuthService.loadUserByUsername(username);
         Authentication authentication = new UsernamePasswordAuthenticationToken(user,
             null, null);
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -94,7 +94,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
   private UserToken createSuperUser(String email) {
     VouchedUser vouchedUser = userDao.getUserByEmail(email).orElseThrow();
     return UserToken.createSuperUserToken(vouchedUser.getId(),
-        vouchedUser.getExternalId(), vouchedUser.getEmail());
+        vouchedUser.getEmail());
   }
 
   private String extractToken(HttpServletRequest request) {

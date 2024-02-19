@@ -4,6 +4,8 @@ import com.hubspot.rosetta.jdbi3.BindWithRosetta;
 import com.vouched.model.domain.ClerkUpdateUserRequest;
 import com.vouched.model.domain.UpdateUserRequest;
 import com.vouched.model.domain.VouchedUser;
+import com.vouched.model.dto.CreateUserDto;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -43,6 +45,12 @@ public interface UserDao {
   @SqlUpdate("UPDATE users SET first_name = :firstName, last_name = :lastName, image_url = :imageUrl WHERE external_id = :externalId")
   void updateUser(@BindWithRosetta ClerkUpdateUserRequest user);
 
-  @SqlUpdate("UPDATE users SET handle = :handle, first_name = :firstName, last_name = :lastName, image_url = :imageUrl, title = :title, bio = :bio, agreement_text = :agreementText, activated_at = :activatedAt WHERE id = :id::uuid")
+  @SqlUpdate("UPDATE users SET handle = :handle, first_name = :firstName, last_name = :lastName, image_url = :imageUrl, title = :title, bio = :bio, agreement_text = :agreementText, activated_at = :activatedAt, external_id := externalId WHERE id = :id::uuid")
   void updateUser(@BindWithRosetta UpdateUserRequest user);
+
+  @SqlQuery("SELECT * FROM users WHERE email = ANY(:homePageEmails)")
+  List<VouchedUser> getUsersWithEmails(Collection<String> homePageEmails);
+
+  @SqlUpdate("INSERT INTO users(first_name, last_name, handle, title, bio, agreement_text image_url, email, external_id) VALUES (:firstName, :lastName, :handle, :title, :bio, :agreementText, :imageUrl, :email, :externalId)")
+  void createUsers(Collection<CreateUserDto> values);
 }

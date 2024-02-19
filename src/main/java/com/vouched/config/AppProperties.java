@@ -19,6 +19,9 @@ public class AppProperties {
   @Value("${app.admin-emails}")
   public List<String> adminEmails;
 
+  @Value("${app.homepage-emails}")
+  public List<String> homePageEmails;
+
   @Value("${app.clerk-secret}")
   public String clerkSecret;
 

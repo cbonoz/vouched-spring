@@ -13,6 +13,7 @@ import com.vouched.model.domain.VouchedUser;
 import com.vouched.model.dto.EndorsementAccessRequest;
 import com.vouched.model.param.BasicEmailTemplate;
 import com.vouched.service.UserInputService;
+import com.vouched.service.UserService;
 import com.vouched.service.email.EmailService;
 import java.util.List;
 import java.util.Optional;
@@ -30,21 +31,29 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/public")
 public class PublicController {
 
-  private final UserDao userDao;
   private final EndorsementDao endorsementDao;
 
   private final AccessDao accessDao;
+  private final UserDao userDao;
+  private final UserService userService;
   private final EmailService emailService;
   private final UserInputService userInputService;
 
   @Inject
   public PublicController(UserDao userDao, EndorsementDao endorsementDao,
-      AccessDao accessDao, EmailService emailService, UserInputService userInputService) {
+      AccessDao accessDao, UserService userService,
+      EmailService emailService, UserInputService userInputService) {
     this.userDao = userDao;
+    this.userService = userService;
     this.endorsementDao = endorsementDao;
     this.accessDao = accessDao;
     this.emailService = emailService;
     this.userInputService = userInputService;
+  }
+
+  @GetMapping("/homepage-profiles")
+  public ResponseEntity<List<PublicProfileUser>> getHomepageProfiles() {
+    return ResponseEntity.ok(userService.getHomePageProfiles());
   }
 
   @GetMapping("/up")
