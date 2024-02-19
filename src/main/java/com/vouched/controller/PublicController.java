@@ -71,13 +71,15 @@ public class PublicController {
     String emailToNotify = vouchedUser.getEmail();
 
     BasicEmailTemplate basicEmailTemplate = new BasicEmailTemplate(
-        "New Access Request from " + endorsementAccessRequest.email().toLowerCase()
-            + ":<br/><br/>" + endorsementAccessRequest.message(),
+        "You have a new Vouched endorsement page access request from "
+            + endorsementAccessRequest.email()
+            .toLowerCase()
+            + ": " + endorsementAccessRequest.message(),
         "Accept/reject request",
         "usevouched.com/profile?tab=access"
     );
 
-    emailService.sendBasicEmail(emailToNotify, "New Endorsement Access Request",
+    emailService.sendBasicEmail(emailToNotify, "New Vouched page access request",
         basicEmailTemplate);
 
     return ResponseEntity.ok(accessDao.getEndorsementById(accessId));
