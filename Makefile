@@ -4,3 +4,6 @@ deploy:
 
 test:
 	./gradlew test
+
+db:
+  fly postgres connect -a vouched-db
