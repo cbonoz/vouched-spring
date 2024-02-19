@@ -1,6 +1,5 @@
 package com.vouched.model.domain;
 
-import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.Data;
@@ -17,7 +16,7 @@ public class UpdateUserRequest {
   String bio;
   String agreementText;
   String imageUrl;
-  Date activatedAt;
+  long activatedAt;
 
 
 }

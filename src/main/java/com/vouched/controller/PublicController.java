@@ -71,8 +71,9 @@ public class PublicController {
     String emailToNotify = vouchedUser.getEmail();
 
     BasicEmailTemplate basicEmailTemplate = new BasicEmailTemplate(
-        "New Access Request:<br/><br/>" + endorsementAccessRequest.message(),
-        "You have a new access request from " + endorsementAccessRequest.email(),
+        "New Access Request from " + endorsementAccessRequest.email().toLowerCase()
+            + ":<br/><br/>" + endorsementAccessRequest.message(),
+        "Accept/reject request",
         "usevouched.com/profile?tab=access"
     );
 
@@ -96,7 +97,7 @@ public class PublicController {
 
     VouchedUser vouchedUser = handleUserMaybe.get();
 
-    if (vouchedUser.getActivatedAt() == null) {
+    if (vouchedUser.getActivatedAt() == 0) {
       return ResponseEntity.notFound().build();
     }
 

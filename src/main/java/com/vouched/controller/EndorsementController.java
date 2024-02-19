@@ -89,6 +89,7 @@ public class EndorsementController {
         dto.message(),
         dto.firstName(),
         dto.lastName(),
+        dto.skills(),
         dto.relationship()
     );
 

@@ -13,7 +13,7 @@ public class VouchedUser {
   String firstName;
   String lastName;
   String imageUrl;
-  Date activatedAt;
+  long activatedAt;
   Date createdAt;
   Date updatedAt;
 

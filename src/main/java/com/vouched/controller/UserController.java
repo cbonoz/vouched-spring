@@ -95,6 +95,9 @@ public class UserController {
   public ResponseEntity<VouchedUser> updateUser(@CurrentUser UserToken user,
       @RequestBody UpdateUserRequest updateUserRequest) {
     updateUserRequest.setId(Optional.of(user.id()));
+    if (updateUserRequest.getImageUrl() == null) {
+      updateUserRequest.setImageUrl(user.imageUrl());
+    }
     userDao.updateUser(updateUserRequest);
     return ResponseEntity.ok(userDao.getUserById(user.id()).orElseThrow());
   }

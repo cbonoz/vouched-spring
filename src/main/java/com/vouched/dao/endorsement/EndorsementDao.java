@@ -26,8 +26,9 @@ public interface EndorsementDao {
   Optional<Endorsement> deleteEndorsement(UUID endorsementId);
 
   // create
-  @SqlQuery("INSERT INTO endorsements(endorser_id, message, first_name, last_name, relationship) VALUES(:endorserId, :message, :firstName, :lastName, :relationship) returning *")
+  @SqlQuery("INSERT INTO endorsements(endorser_id, message, first_name, last_name, skills, relationship) VALUES(:endorserId, :message, :firstName, :lastName, :skills, :relationship) returning *")
   @GetGeneratedKeys
   UUID createEndorsement(@Bind UUID endorserId, @Bind String message,
-      @Bind String firstName, @Bind String lastName, @Bind String relationship);
+      @Bind String firstName, @Bind String lastName, @Bind String skills,
+      @Bind String relationship);
 }

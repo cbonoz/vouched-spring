@@ -43,6 +43,6 @@ public interface UserDao {
   @SqlUpdate("UPDATE users SET first_name = :firstName, last_name = :lastName, image_url = :imageUrl WHERE external_id = :externalId")
   void updateUser(@BindWithRosetta ClerkUpdateUserRequest user);
 
-  @SqlUpdate("UPDATE users SET handle = :handle, first_name = :firstName, last_name = :lastName, image_url = :imageUrl, title = :title, bio = :bio, agreement_text = :agreementText, activated_at = to_timestamp(:activatedAt) WHERE id = :id::uuid")
+  @SqlUpdate("UPDATE users SET handle = :handle, first_name = :firstName, last_name = :lastName, image_url = :imageUrl, title = :title, bio = :bio, agreement_text = :agreementText, activated_at = :activatedAt WHERE id = :id::uuid")
   void updateUser(@BindWithRosetta UpdateUserRequest user);
 }

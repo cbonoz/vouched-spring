@@ -10,6 +10,7 @@ public class Endorsement {
   UUID id;
   UUID endorserId;
   String relationship;
+  String skills;
   String firstName;
   String lastName;
   String message;

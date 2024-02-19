@@ -11,7 +11,7 @@ CREATE TABLE users(
     created_at    TIMESTAMP DEFAULT now() NOT NULL,
     updated_at    TIMESTAMP DEFAULT now() NOT NULL,
     deleted_at    TIMESTAMP,
-    activated_at  TIMESTAMP,
+    activated_at  BIGINT,
     image_url     text,
     first_name    text,
     last_name     text,
@@ -38,6 +38,8 @@ CREATE TABLE endorsements(
     first_name    citext,
     last_name     citext,
     relationship  citext,
+    skills        text,
+    social_links  jsonb,
     endorser_id   UUID        NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (endorser_id) REFERENCES users (id)
