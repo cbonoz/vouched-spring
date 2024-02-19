@@ -36,8 +36,12 @@ headers = {
     'Authorization': f'Bearer {VOUCH_SECRET}',
     'X-Email': 'superuser@example.com'
 }
-response = requests.post(url, json=user_data, headers=headers)
-print(response.text)
+
+try:
+    response = requests.post(url, json=user_data, headers=headers)
+    print('response', response.text)
+except Exception as e:
+    print('error' ,e)
 
 
 
