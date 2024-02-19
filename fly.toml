@@ -27,3 +27,5 @@ handlers = ["tls"]
 start_port = 8001
 end_port = 8001
 
+[[vm]]
+memory = "512mb"
