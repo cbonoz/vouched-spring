@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.jdbi.v3.sqlobject.customizer.Bind;
+import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -48,8 +49,8 @@ public interface UserDao {
   @SqlUpdate("UPDATE users SET handle = :handle, first_name = :firstName, last_name = :lastName, image_url = :imageUrl, title = :title, bio = :bio, agreement_text = :agreementText, activated_at = :activatedAt, external_id := externalId WHERE id = :id::uuid")
   void updateUser(@BindWithRosetta UpdateUserRequest user);
 
-  @SqlQuery("SELECT * FROM users WHERE email = ANY(:homePageEmails)")
-  List<VouchedUser> getUsersWithEmails(Collection<String> homePageEmails);
+  @SqlQuery("SELECT * FROM users WHERE email in (<emails>)")
+  List<VouchedUser> getUsersWithEmails(@BindList Collection<String> emails);
 
   // bind bean list
   @SqlUpdate("INSERT INTO users(first_name, last_name, handle, title, bio, agreement_text, image_url, email, external_id) VALUES (:firstName, :lastName, :handle, :title, :bio, :agreementText, :imageUrl, :email, :externalId) on conflict (email) do nothing")

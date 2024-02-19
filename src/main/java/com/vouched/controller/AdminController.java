@@ -12,6 +12,7 @@ import com.vouched.model.domain.PublicProfileUser;
 import com.vouched.model.domain.VouchedUser;
 import com.vouched.model.dto.BasicQueryRequest;
 import com.vouched.model.dto.CreateEndorsementDto;
+import com.vouched.model.dto.CreateUserDto;
 import com.vouched.service.EndorsementService;
 import com.vouched.service.UserService;
 import java.util.List;
@@ -62,12 +63,13 @@ public class AdminController {
   }
 
   @PostMapping("/users/upload")
-  public ResponseEntity<List<String>> uploadUsers(@CurrentUser UserToken currentUser,
+  public ResponseEntity<List<CreateUserDto>> uploadUsers(
+      @CurrentUser UserToken currentUser,
       @RequestBody Map<String, PublicProfileUser> emailToUserMap) {
     userService.validateSuperUser(currentUser);
 
-    List<String> emails = userService.uploadUsers(emailToUserMap);
-    return ResponseEntity.ok(emails);
+    List<CreateUserDto> users = userService.uploadUsers(emailToUserMap);
+    return ResponseEntity.ok(users);
   }
 
   @PostMapping("/endorsements/upload")
@@ -77,11 +79,13 @@ public class AdminController {
     userService.validateSuperUser(currentUser);
 
     // get emails
-    Set<String> emails = emailToEndorsementsMap.keySet();
+    Set<String> emails = emailToEndorsementsMap.keySet().stream().map(String::trim)
+        .collect(toSet());
     List<VouchedUser> usersWithEmails = userDao.getUsersWithEmails(emails);
     // check emails
     if (usersWithEmails.size() != emails.size()) {
       Set<String> existingEmails = usersWithEmails.stream().map(VouchedUser::getEmail)
+          .map(String::trim)
           .collect(toSet());
       emails.removeAll(existingEmails);
       throw new SoftException("Users do not exist: " + emails);
@@ -91,7 +95,7 @@ public class AdminController {
     // iterate over users
     for (VouchedUser user : usersWithEmails) {
       List<CreateEndorsementDto> endorsements = emailToEndorsementsMap.get(
-          user.getEmail());
+          user.getEmail().trim());
       for (CreateEndorsementDto endorsement : endorsements) {
         endorsementService.validateEndorsement(endorsement);
         try {

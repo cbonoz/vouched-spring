@@ -7,29 +7,27 @@ import pandas as pd
 import requests
 
 VOUCH_SECRET = os.environ.get('VOUCH_SECRET')
-print('secret', VOUCH_SECRET)
+VOUCH_URL = os.environ.get('VOUCH_URL')
+print('secret', VOUCH_SECRET, VOUCH_URL)
 
 user_df = pd.read_csv('data/users.csv')
-endorse_df = pd.read_csv('data/endorsements.csv')
 
 def convert_standard_spaced_words_to_camel_case(s):
     word = ''.join([word.capitalize() for word in s.split(' ')])
     return word[0].lower() + word[1:]
 
 
-BASE_URL = 'http://localhost:8001'
-
 # http post to server
-url = f"{BASE_URL}/admin/users/upload"
+url = f"{VOUCH_URL}/admin/users/upload"
 
 # send user data
 user_df   = user_df.rename(columns=convert_standard_spaced_words_to_camel_case)
+user_df = user_df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
 # filter empty cols
 user_df = user_df.dropna(axis=1, how='all')
 # convert keys in object list using convert function above
 user_data = {u['email']: u for u in user_df.to_dict(orient='records')}
 print('data', user_data)
-
 
 
 

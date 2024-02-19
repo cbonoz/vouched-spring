@@ -41,7 +41,7 @@ public class UserService {
         .toList();
   }
 
-  public List<String> uploadUsers(Map<String, PublicProfileUser> emailToUserMap) {
+  public List<CreateUserDto> uploadUsers(Map<String, PublicProfileUser> emailToUserMap) {
     // check for existing users by email
     Set<String> emails = emailToUserMap.keySet();
     List<VouchedUser> existingUsers = userDao.getUsersWithEmails(emails);
@@ -63,22 +63,22 @@ public class UserService {
     // create new users one by one
     usersToCreate.forEach(userDao::insertUser);
 
-    return emails.stream().toList();
+    return usersToCreate;
   }
 
   public CreateUserDto createUserDto(PublicProfileUser user, String email,
       String imageUrl) {
     CreateUserDto createUserDto = new CreateUserDto();
-    createUserDto.setFirstName(user.firstName());
-    createUserDto.setLastName(user.lastName());
-    createUserDto.setEmail(email);
-    createUserDto.setImageUrl(imageUrl);
+    createUserDto.setFirstName(user.firstName().trim());
+    createUserDto.setLastName(user.lastName().trim());
+    createUserDto.setEmail(email.trim());
+    createUserDto.setImageUrl(imageUrl.trim());
     // make handle
     String handle = user.handle() != null ? user.handle() : String.format("%s-%s",
-        user.firstName().toLowerCase(), user.lastName().toLowerCase());
+        user.firstName().toLowerCase().trim(), user.lastName().toLowerCase().trim());
     createUserDto.setHandle(handle);
-    createUserDto.setBio(user.bio());
-    createUserDto.setTitle(user.title());
+    createUserDto.setBio(user.bio().trim());
+    createUserDto.setTitle(user.title().trim());
     createUserDto.setAgreementText(user.agreementText());
     createUserDto.setExternalId(null);
     return createUserDto;
