@@ -65,12 +65,17 @@ public class EndorserAccessController {
 
     EndorserAccess endorserAccess = endorserAccessMaybe.get();
 
+    String handle = user.handle();
+    String firstName = user.firstName() != null ? user.firstName() : handle;
+
     String actionMessage =
         actionRequest.action().equals("accept") ? "approved" : "rejected";
-    String content = String.format("Your request to access %s Vouched list has been %s!",
-        user.firstName(), actionMessage);
+    String content = String.format(
+        "Your request to access %s's Vouched list has been %s!",
+        firstName, actionMessage);
+
     BasicEmailTemplate basicEmailTemplate = new BasicEmailTemplate(
-        content, "View profile", "usevouched.com/profile/" + user.handle());
+        content, "View profile", "usevouched.com/profile/" + handle);
 
     emailService.sendBasicEmail(endorserAccess.getRequesterEmail(),
         "Vouched Access Update (" + actionMessage + ")", basicEmailTemplate);
