@@ -51,6 +51,7 @@ public interface UserDao {
   @SqlQuery("SELECT * FROM users WHERE email = ANY(:homePageEmails)")
   List<VouchedUser> getUsersWithEmails(Collection<String> homePageEmails);
 
-  @SqlUpdate("INSERT INTO users(first_name, last_name, handle, title, bio, agreement_text image_url, email, external_id) VALUES (:firstName, :lastName, :handle, :title, :bio, :agreementText, :imageUrl, :email, :externalId)")
-  void createUsers(Collection<CreateUserDto> values);
+  // bind bean list
+  @SqlUpdate("INSERT INTO users(first_name, last_name, handle, title, bio, agreement_text, image_url, email, external_id) VALUES (:firstName, :lastName, :handle, :title, :bio, :agreementText, :imageUrl, :email, :externalId) on conflict (email) do nothing")
+  void insertUser(@BindWithRosetta CreateUserDto user);
 }

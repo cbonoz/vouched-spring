@@ -13,6 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Map;
+import java.util.UUID;
 import javax.inject.Inject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -92,9 +93,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
   }
 
   private UserToken createSuperUser(String email) {
-    VouchedUser vouchedUser = userDao.getUserByEmail(email).orElseThrow();
-    return UserToken.createSuperUserToken(vouchedUser.getId(),
-        vouchedUser.getEmail());
+    UUID userId = userDao.getUserByEmail(email).map(VouchedUser::getId).orElse(
+        UUID.randomUUID());
+    return UserToken.createSuperUserToken(userId, email);
   }
 
   private String extractToken(HttpServletRequest request) {

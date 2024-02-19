@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import javax.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,6 +31,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
+
+  // log
+  private static final Logger LOG = LoggerFactory.getLogger(AdminController.class);
 
   private final EndorsementService endorsementService;
   private final UserDao userDao;
@@ -60,7 +65,7 @@ public class AdminController {
   public ResponseEntity<List<String>> uploadUsers(@CurrentUser UserToken currentUser,
       @RequestBody Map<String, PublicProfileUser> emailToUserMap) {
     userService.validateSuperUser(currentUser);
-    
+
     List<String> emails = userService.uploadUsers(emailToUserMap);
     return ResponseEntity.ok(emails);
   }
@@ -89,11 +94,16 @@ public class AdminController {
           user.getEmail());
       for (CreateEndorsementDto endorsement : endorsements) {
         endorsementService.validateEndorsement(endorsement);
-        UUID endorsementId = endorsementDao.createEndorsement(user.getId(),
-            endorsement.message(),
-            endorsement.firstName(), endorsement.lastName(), endorsement.skills(),
-            endorsement.relationship());
-        endorsementIds.add(endorsementId);
+        try {
+          UUID endorsementId = endorsementDao.createEndorsement(user.getId(),
+              endorsement.message(),
+              endorsement.firstName(), endorsement.lastName(), endorsement.skills(),
+              endorsement.relationship());
+          endorsementIds.add(endorsementId);
+        } catch (Exception e) {
+          LOG.warn("Failed to create endorsement for user: " + endorsement,
+              e);
+        }
       }
     }
 

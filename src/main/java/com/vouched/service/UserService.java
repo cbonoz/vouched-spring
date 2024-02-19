@@ -10,6 +10,7 @@ import com.vouched.model.dto.CreateUserDto;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 
@@ -44,10 +45,13 @@ public class UserService {
     // check for existing users by email
     Set<String> emails = emailToUserMap.keySet();
     List<VouchedUser> existingUsers = userDao.getUsersWithEmails(emails);
-    if (!existingUsers.isEmpty()) {
-      throw new SoftException("Users already exist: " + existingUsers);
-    }
+
+    Set<String> existingEmails = existingUsers.stream()
+        .map(VouchedUser::getEmail)
+        .collect(Collectors.toSet());
+
     List<CreateUserDto> usersToCreate = emailToUserMap.entrySet().stream()
+        .filter(emailUserEntry -> !existingEmails.contains(emailUserEntry.getKey()))
         .map(emailUserEntry -> {
           // Upload image to clerk
           String email = emailUserEntry.getKey();
@@ -56,8 +60,9 @@ public class UserService {
           return createUserDto(user, email, imageUrl);
         }).toList();
 
-    // create new users
-    userDao.createUsers(usersToCreate);
+    // create new users one by one
+    usersToCreate.forEach(userDao::insertUser);
+
     return emails.stream().toList();
   }
 
@@ -68,7 +73,10 @@ public class UserService {
     createUserDto.setLastName(user.lastName());
     createUserDto.setEmail(email);
     createUserDto.setImageUrl(imageUrl);
-    createUserDto.setHandle(user.handle());
+    // make handle
+    String handle = user.handle() != null ? user.handle() : String.format("%s-%s",
+        user.firstName().toLowerCase(), user.lastName().toLowerCase());
+    createUserDto.setHandle(handle);
     createUserDto.setBio(user.bio());
     createUserDto.setTitle(user.title());
     createUserDto.setAgreementText(user.agreementText());
