@@ -58,7 +58,7 @@ public class UserAuthService {
 
     return new UserToken(
         createdUser.getId(),
-        userToken.externalId(),
+        userToken.id(),
         emailAddress,
         userToken.imageUrl(),
         userToken.firstName(),

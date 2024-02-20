@@ -46,7 +46,7 @@ public interface UserDao {
   @SqlUpdate("UPDATE users SET first_name = :firstName, last_name = :lastName, image_url = :imageUrl WHERE external_id = :externalId")
   void updateUser(@BindWithRosetta ClerkUpdateUserRequest user);
 
-  @SqlUpdate("UPDATE users SET handle = :handle, first_name = :firstName, last_name = :lastName, image_url = :imageUrl, title = :title, bio = :bio, agreement_text = :agreementText, activated_at = :activatedAt, external_id := externalId WHERE id = :id::uuid")
+  @SqlUpdate("UPDATE users SET handle = :handle, first_name = :firstName, last_name = :lastName, image_url = :imageUrl, title = :title, bio = :bio, agreement_text = :agreementText, activated_at = :activatedAt, external_id = :externalId WHERE id = :id::uuid")
   void updateUser(@BindWithRosetta UpdateUserRequest user);
 
   @SqlQuery("SELECT * FROM users WHERE email in (<emails>)")
