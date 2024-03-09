@@ -28,6 +28,8 @@ df = df.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
 df = df.dropna(axis=1, how='all')
 # convert keys in object list using convert function above
 print('df', df)
+# replace nan with empty string
+df = df.fillna('')
 # group rows with matching email
 records = df.to_dict(orient='records')
 print('records', records)

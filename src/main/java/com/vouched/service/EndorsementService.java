@@ -37,8 +37,5 @@ public class EndorsementService {
     if (Strings.isBlank(dto.lastName())) {
       throw new SoftException("Last name cannot be empty");
     }
-    if (Strings.isBlank(dto.relationship())) {
-      throw new SoftException("Relationship cannot be empty");
-    }
   }
 }
